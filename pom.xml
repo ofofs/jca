@@ -6,7 +6,147 @@
 
     <groupId>com.github.ofofs</groupId>
     <artifactId>jca</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
+    <modules>
+        <module>jca-core</module>
+        <module>jca-test</module>
+    </modules>
 
+    <name>Jca</name>
+    <description>Java Compile Annotation</description>
+
+    <url>https://github.com/ofofs/jca</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>ofofs</name>
+            <email>java@kangyonggan.com</email>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git@github.com/ofofs/jca.git</connection>
+        <developerConnection>scm:git:git@github.com/ofofs/jca.git</developerConnection>
+        <url>git@github.com/ofofs/jca.git</url>
+    </scm>
+
+    <properties>
+        <!--Project-->
+        <project.build.varsion>1.0-SNAPSHOT</project.build.varsion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!--Plugin-->
+        <plugin.compiler.version>3.5.1</plugin.compiler.version>
+        <plugin.compiler.level>1.8</plugin.compiler.level>
+        <plugin.source.version>2.2.1</plugin.source.version>
+        <plugin.javadoc.version>2.9.1</plugin.javadoc.version>
+        <plugin.gpg.version>1.6</plugin.gpg.version>
+
+        <!--Other-->
+        <tools.version>1.5.0</tools.version>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!--Compiler Plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${plugin.compiler.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--Project-->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jca-core</artifactId>
+                <version>${project.build.varsion}</version>
+            </dependency>
+
+            <!--Other-->
+            <dependency>
+                <groupId>sun.jdk</groupId>
+                <artifactId>tools</artifactId>
+                <version>${tools.version}</version>
+                <scope>system</scope>
+                <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- Source -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${plugin.source.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Javadoc -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${plugin.javadoc.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- GPG -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${plugin.gpg.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>oss</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>oss</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>
