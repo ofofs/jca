@@ -1,11 +1,9 @@
 package com.github.ofofs.jca.util;
 
-import com.github.ofofs.jca.model.JcaClass;
-import com.github.ofofs.jca.model.JcaObject;
+import com.github.ofofs.jca.model.*;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.Trees;
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
@@ -68,26 +66,56 @@ public final class JcaUtil {
     /**
      * 在类中创建一个字段（自动去重）
      *
-     * @param jcaClass  所在类
-     * @param modifiers 修饰符
-     * @param typeClass 字段类型
-     * @param fieldName 字段名称
-     * @param value     字段的值
+     * @param jcaClass 所在类
+     * @param jcaField 字段
      */
-    public static void createField(JcaClass jcaClass, int modifiers, Class<?> typeClass, String fieldName, JCTree.JCExpression value) {
+    public static void createField(JcaClass jcaClass, JcaField jcaField) {
         JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) trees.getTree(jcaClass.getClazz());
         ListBuffer<JCTree> statements = new ListBuffer<>();
 
-        if (existsField(jcaClass, fieldName)) {
+        if (existsField(jcaClass, jcaField.getFieldName())) {
             return;
         }
 
-        importPackage(jcaClass, typeClass);
-        statements.append(treeMaker.VarDef(treeMaker.Modifiers(modifiers), names.fromString(fieldName), getType(typeClass), value));
+        importPackage(jcaClass, jcaField.getTypeClass());
+        statements.append(treeMaker.VarDef(treeMaker.Modifiers(jcaField.getModifiers()), names.fromString(jcaField.getFieldName()), getType(jcaField.getTypeClass()), jcaField.getValue().getObject()));
         for (JCTree jcTree : classDecl.defs) {
             statements.append(jcTree);
         }
         classDecl.defs = statements.toList();
+    }
+
+    /**
+     * 在方法第一行插入一个变量
+     *
+     * @param jcaMethod   方法
+     * @param jcaVariable 变量
+     */
+    public static void insertVariable(JcaMethod jcaMethod, JcaVariable jcaVariable) {
+        JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) trees.getTree(jcaMethod.getMethod());
+        ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
+
+        importPackage(jcaMethod.getJcaClass(), jcaVariable.getTypeClass());
+        statements.append(treeMaker.VarDef(treeMaker.Modifiers(0), names.fromString(jcaVariable.getVarName()), getType(jcaVariable.getTypeClass()), jcaVariable.getValue().getObject()));
+        for (JCTree.JCStatement statement : methodDecl.body.stats) {
+            statements.append(statement);
+        }
+        methodDecl.body.stats = statements.toList();
+    }
+
+    /**
+     * 调用一个静态无参方法
+     *
+     * @param jcaClass   所在的类
+     * @param clazz      目标类
+     * @param methodName 方法名
+     * @return 方法调用结果
+     */
+    public static JcaObject staticMethod(JcaClass jcaClass, Class<?> clazz, String methodName) {
+        importPackage(jcaClass, clazz);
+        JCTree.JCFieldAccess fieldAccess = treeMaker.Select(treeMaker.Ident(names.fromString(clazz.getSimpleName())), names.fromString(methodName));
+        JCTree.JCMethodInvocation methodInvocation = treeMaker.Apply(List.nil(), fieldAccess, List.nil());
+        return new JcaObject(methodInvocation);
     }
 
     /**
@@ -96,7 +124,7 @@ public final class JcaUtil {
      * @param typeClass 类型
      * @return 返回一个类型
      */
-    public static JCTree.JCIdent getType(Class<?> typeClass) {
+    private static JCTree.JCIdent getType(Class<?> typeClass) {
         Symbol.ClassSymbol sym = new Symbol.ClassSymbol(Sequence.nextLong(), names.fromString(typeClass.getSimpleName()), null);
         return treeMaker.Ident(sym);
     }
@@ -108,7 +136,7 @@ public final class JcaUtil {
      * @param fieldName 字段名
      * @return 若存在返回true，否则返回false
      */
-    public static boolean existsField(JcaClass jcaClass, String fieldName) {
+    private static boolean existsField(JcaClass jcaClass, String fieldName) {
         JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) trees.getTree(jcaClass.getClazz());
         for (JCTree jcTree : classDecl.defs) {
             if (jcTree.getKind() == Tree.Kind.VARIABLE) {
@@ -127,7 +155,7 @@ public final class JcaUtil {
      * @param jcaClass    目标类
      * @param importClass 要导入的包
      */
-    public static void importPackage(JcaClass jcaClass, Class<?> importClass) {
+    private static void importPackage(JcaClass jcaClass, Class<?> importClass) {
         JCTree.JCCompilationUnit compilationUnit = (JCTree.JCCompilationUnit) trees.getPath(jcaClass.getClazz()).getCompilationUnit();
 
         JCTree.JCFieldAccess fieldAccess = treeMaker.Select(treeMaker.Ident(names.fromString(importClass.getPackage().getName())), names.fromString(importClass.getSimpleName()));
@@ -141,27 +169,5 @@ public final class JcaUtil {
         }
 
         compilationUnit.defs = imports.toList();
-    }
-
-    /**
-     * 获取一个null
-     *
-     * @return 返回null
-     */
-    public static JCTree.JCLiteral getNull() {
-        return treeMaker.Literal(TypeTag.BOT, null);
-    }
-
-    /**
-     * 获取对象的值
-     *
-     * @param obj 对象
-     * @return 返回对象的值
-     */
-    public static JCTree.JCExpression getValue(Object obj) {
-        if (obj == null) {
-            return getNull();
-        }
-        return treeMaker.Literal(obj);
     }
 }

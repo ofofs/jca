@@ -19,16 +19,13 @@ public class JcaClass {
     }
 
     /**
-     * 创建一个字段（自动去重）
+     * 插入一个字段
      *
-     * @param modifiers 修饰符
-     * @param typeClass 字段类型
-     * @param fieldName 字段名称
-     * @param value     字段的值
+     * @param jcaField 字段
      * @return 返回当前类
      */
-    public JcaClass createField(int modifiers, Class<?> typeClass, String fieldName, JcaObject value) {
-        JcaUtil.createField(this, modifiers, typeClass, fieldName, value.getObject());
+    public JcaClass insertField(JcaField jcaField) {
+        JcaUtil.createField(this, jcaField);
         return this;
     }
 

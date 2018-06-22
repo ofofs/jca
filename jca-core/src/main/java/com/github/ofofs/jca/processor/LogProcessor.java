@@ -2,9 +2,7 @@ package com.github.ofofs.jca.processor;
 
 import com.github.ofofs.jca.annotation.Log;
 import com.github.ofofs.jca.handler.impl.ConsoleLogHandler;
-import com.github.ofofs.jca.model.JcaClass;
-import com.github.ofofs.jca.model.JcaMethod;
-import com.github.ofofs.jca.model.JcaObject;
+import com.github.ofofs.jca.model.*;
 import com.github.ofofs.jca.util.JcaUtil;
 import com.github.ofofs.jca.util.Sequence;
 import com.sun.tools.javac.code.Flags;
@@ -12,6 +10,8 @@ import com.sun.tools.javac.code.Flags;
 import javax.annotation.processing.RoundEnvironment;
 
 /**
+ * 日志注解处理器
+ *
  * @author kangyonggan
  * @since 6/22/18
  */
@@ -53,7 +53,7 @@ public class LogProcessor extends BaseProcessor {
     }
 
     /**
-     * "fieldName.logAfter(packageName, methodName, startTime, returnValue);"
+     * fieldName.logAfter(packageName, methodName, startTime, returnValue);
      *
      * @param jcaMethod 方法
      * @param fieldName 字段名
@@ -64,18 +64,25 @@ public class LogProcessor extends BaseProcessor {
     }
 
     /**
-     * "Long startTime = System.currentTimeMillis();"
+     * Long startTime = System.currentTimeMillis();
      *
      * @param jcaMethod 方法
      * @return 返回变量名
      */
     private String createStartTime(JcaMethod jcaMethod) {
-        // TODO
-        return null;
+        String varName = Sequence.nextString("var");
+
+        // System.currentTimeMillis()
+        JcaObject value = JcaUtil.staticMethod(jcaMethod.getJcaClass(), System.class, "currentTimeMillis");
+
+        // Long startTime = value;
+        JcaVariable jcaVariable = new JcaVariable(Long.class, varName, value);
+        jcaMethod.insert(jcaVariable);
+        return varName;
     }
 
     /**
-     * "fieldName.logBefore(packageName, methodName, args);"
+     * fieldName.logBefore(packageName, methodName, args);
      *
      * @param jcaMethod 方法
      * @param fieldName 字段名称
@@ -85,17 +92,18 @@ public class LogProcessor extends BaseProcessor {
     }
 
     /**
-     * "private static final ConsoleLogHandler fieldName = new ConsoleLogHandler();"
+     * private static final ConsoleLogHandler fieldName = new ConsoleLogHandler();
      *
      * @param jcaClass  类
      * @param fieldName 字段名
      */
     private void createField(JcaClass jcaClass, String fieldName) {
-        // new ConsoleLogHandler()
         // TODO 暂时写死ConsoleLogHandler，后面可配置
+        // new ConsoleLogHandler()
         JcaObject value = JcaUtil.instance(ConsoleLogHandler.class);
 
         // private static final ConsoleLogHandler fieldName = value;
-        jcaClass.createField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, ConsoleLogHandler.class, fieldName, value);
+        JcaField jcaField = new JcaField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, ConsoleLogHandler.class, fieldName, value);
+        jcaClass.insertField(jcaField);
     }
 }
