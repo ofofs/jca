@@ -4,6 +4,7 @@ import com.github.ofofs.jca.model.*;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.Trees;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
@@ -104,6 +105,23 @@ public final class JcaUtil {
     }
 
     /**
+     * 在方法第一行插入一个表达式
+     *
+     * @param jcaMethod 方法
+     * @param jcaObject 表达式
+     */
+    public static void insertExpress(JcaMethod jcaMethod, JcaObject jcaObject) {
+        JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) trees.getTree(jcaMethod.getMethod());
+        ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
+
+        statements.append(treeMaker.Exec(jcaObject.getObject()));
+        for (JCTree.JCStatement statement : methodDecl.body.stats) {
+            statements.append(statement);
+        }
+        methodDecl.body.stats = statements.toList();
+    }
+
+    /**
      * 调用一个静态无参方法
      *
      * @param jcaClass   所在的类
@@ -116,6 +134,72 @@ public final class JcaUtil {
         JCTree.JCFieldAccess fieldAccess = treeMaker.Select(treeMaker.Ident(names.fromString(clazz.getSimpleName())), names.fromString(methodName));
         JCTree.JCMethodInvocation methodInvocation = treeMaker.Apply(List.nil(), fieldAccess, List.nil());
         return new JcaObject(methodInvocation);
+    }
+
+    /**
+     * 调用变量的一个无参方法
+     *
+     * @param varName    变量名
+     * @param methodName 方法名
+     * @return 返回调用结果
+     */
+    public static JcaObject method(String varName, String methodName) {
+        return method(varName, methodName, null);
+    }
+
+    /**
+     * 调用变量的一个方法
+     *
+     * @param varName    变量名
+     * @param methodName 方法名
+     * @param args       参数
+     * @return 返回调用结果
+     */
+    public static JcaObject method(String varName, String methodName, java.util.List<JcaObject> args) {
+        JCTree.JCFieldAccess fieldAccess = treeMaker.Select(treeMaker.Ident(names.fromString(varName)), names.fromString(methodName));
+        List argsList = List.nil();
+        if (args != null) {
+            for (JcaObject jcaObject : args) {
+                argsList = argsList.append(jcaObject.getObject());
+            }
+        }
+        JCTree.JCMethodInvocation methodInvocation = treeMaker.Apply(List.nil(), fieldAccess, argsList);
+        return new JcaObject(methodInvocation);
+    }
+
+    /**
+     * 获取对象的值
+     *
+     * @param obj 对象
+     * @return 返回对象的值
+     */
+    public static JcaObject getValue(Object obj) {
+        if (obj == null) {
+            return getNull();
+        }
+        return new JcaObject(treeMaker.Literal(obj));
+    }
+
+    /**
+     * 获取变量
+     *
+     * @param var 变量
+     * @return 返回变量
+     */
+    public static JcaObject getVar(Symbol var) {
+        if (var == null) {
+            return getNull();
+        }
+        return new JcaObject(treeMaker.Ident(var));
+    }
+
+    /**
+     * 获取一个null
+     *
+     * @return 返回null
+     */
+    public static JcaObject getNull() {
+        return new JcaObject(treeMaker.Literal(TypeTag.BOT, null));
     }
 
     /**

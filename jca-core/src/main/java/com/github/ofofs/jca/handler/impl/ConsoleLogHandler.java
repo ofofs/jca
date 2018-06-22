@@ -3,8 +3,8 @@ package com.github.ofofs.jca.handler.impl;
 import com.alibaba.fastjson.JSON;
 import com.github.ofofs.jca.handler.LogHandler;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author kangyonggan
@@ -12,14 +12,13 @@ import java.util.Date;
  */
 public class ConsoleLogHandler implements LogHandler {
 
-    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     @Override
-    public void logBefore(String packageName, String methodName, Object... args) {
-        log(packageName, methodName, String.format("method args：%s", JSON.toJSONString(args)));
+    public void logBefore(String packageName, String className, String methodName, Object... args) {
+        String date = LocalDateTime.now().format(FORMAT);
+        String msg = String.format("[INFO ] %s [%s.%s]<%s> - method args：%s", date, packageName, className, methodName, JSON.toJSONString(args));
+        System.out.println(msg);
     }
 
-    private void log(String packageName, String methodName, String msg) {
-        System.out.println(String.format("[INFO ] %s [%s]<%s> - %s", format.format(new Date()), packageName, methodName, msg));
-    }
 }

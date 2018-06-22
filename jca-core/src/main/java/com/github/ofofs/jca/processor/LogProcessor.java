@@ -8,6 +8,8 @@ import com.github.ofofs.jca.util.Sequence;
 import com.sun.tools.javac.code.Flags;
 
 import javax.annotation.processing.RoundEnvironment;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 日志注解处理器
@@ -88,7 +90,18 @@ public class LogProcessor extends BaseProcessor {
      * @param fieldName 字段名称
      */
     private void createLogBefore(JcaMethod jcaMethod, String fieldName) {
-        // TODO
+        List<JcaObject> args = new ArrayList<>();
+        // packageName
+        args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getPackageName()));
+        // className
+        args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getClassName()));
+        // methodName
+        args.add(JcaUtil.getValue(jcaMethod.getMethodName()));
+        // method's args
+        args.addAll(jcaMethod.getArgs());
+
+        JcaObject express = JcaUtil.method(fieldName, "logBefore", args);
+        jcaMethod.insert(express);
     }
 
     /**
@@ -104,6 +117,6 @@ public class LogProcessor extends BaseProcessor {
 
         // private static final ConsoleLogHandler fieldName = value;
         JcaField jcaField = new JcaField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, ConsoleLogHandler.class, fieldName, value);
-        jcaClass.insertField(jcaField);
+        jcaClass.insert(jcaField);
     }
 }
