@@ -1,5 +1,7 @@
 package com.github.ofofs.jca.processor;
 
+import com.github.ofofs.jca.util.JcaUtil;
+
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
@@ -17,12 +19,13 @@ public class JcaProcessor extends AbstractProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
+        JcaUtil.init(env);
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         // 日志
-        new LogProcessor().process(env);
+        new LogProcessor(env).process();
         return true;
     }
 
