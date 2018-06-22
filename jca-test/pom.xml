@@ -11,8 +11,8 @@
 
     <artifactId>jca-test</artifactId>
 
-    <name>Extra Test</name>
-    <description>Java Compile Annotation Extra Test</description>
+    <name>Jca Test</name>
+    <description>Java Compile Annotation Test</description>
 
     <build>
         <plugins>
