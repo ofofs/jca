@@ -11,7 +11,7 @@ import java.util.Set;
  * @author kangyonggan
  * @since 6/22/18
  */
-@SupportedAnnotationTypes("com.github.ofofs.jca.annotation.Serial")
+@SupportedAnnotationTypes("com.github.ofofs.jca.annotation.Log")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class JcaProcessor extends AbstractProcessor {
 
@@ -21,6 +21,8 @@ public class JcaProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+        // 日志
+        new LogProcessor().process(env);
         return true;
     }
 
