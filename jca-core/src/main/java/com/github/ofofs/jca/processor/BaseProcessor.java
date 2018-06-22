@@ -1,5 +1,6 @@
 package com.github.ofofs.jca.processor;
 
+import com.github.ofofs.jca.model.JcaClass;
 import com.github.ofofs.jca.model.JcaMethod;
 import com.sun.tools.javac.code.Symbol;
 
@@ -42,5 +43,20 @@ public abstract class BaseProcessor {
             jcaMethods.add(new JcaMethod((Symbol.MethodSymbol) e));
         }
         return jcaMethods;
+    }
+
+    /**
+     * 获取带有指定注解的类
+     *
+     * @param annotationClass 注解类
+     * @return 返回所有带有指定注解的类
+     */
+    protected Set<JcaClass> getJcaClasses(Class<? extends Annotation> annotationClass) {
+        Set<? extends Element> elements = env.getElementsAnnotatedWith(annotationClass);
+        Set<JcaClass> jcaClasses = new HashSet<>(elements.size());
+        for (Element e : elements) {
+            jcaClasses.add(new JcaClass((Symbol.ClassSymbol) e));
+        }
+        return jcaClasses;
     }
 }

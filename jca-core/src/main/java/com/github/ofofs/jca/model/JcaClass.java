@@ -48,4 +48,15 @@ public class JcaClass {
         String fullName = clazz.fullname.toString();
         return fullName.substring(fullName.lastIndexOf(".") + 1);
     }
+
+    /**
+     * 添加接口
+     *
+     * @param interfaceClass 接口类
+     * @return 返回当前类
+     */
+    public JcaClass addInterface(Class<?> interfaceClass) {
+        JcaUtil.addInterface(this, interfaceClass);
+        return this;
+    }
 }

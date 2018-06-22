@@ -216,6 +216,31 @@ public final class JcaUtil {
     }
 
     /**
+     * 给类添加一个接口
+     *
+     * @param jcaClass       类
+     * @param interfaceClass 接口
+     */
+    public static void addInterface(JcaClass jcaClass, Class<?> interfaceClass) {
+        // 判断类有没有实现此接口
+        if (!hasInterface(jcaClass, interfaceClass)) {
+            // 导包（会自动去重）
+            importPackage(jcaClass, interfaceClass);
+
+            JCTree.JCClassDecl clazz = (JCTree.JCClassDecl) trees.getTree(jcaClass.getClazz());
+            java.util.List<JCTree.JCExpression> implementing = clazz.implementing;
+            ListBuffer<JCTree.JCExpression> statements = new ListBuffer<>();
+            for (JCTree.JCExpression impl : implementing) {
+                statements.append(impl);
+            }
+
+            Symbol.ClassSymbol sym = new Symbol.ClassSymbol(Sequence.nextLong(), names.fromString(interfaceClass.getSimpleName()), null);
+            statements.append(treeMaker.Ident(sym));
+            clazz.implementing = statements.toList();
+        }
+    }
+
+    /**
      * 获取一个类型
      *
      * @param typeClass 类型
@@ -266,5 +291,23 @@ public final class JcaUtil {
         }
 
         compilationUnit.defs = imports.toList();
+    }
+
+
+    /**
+     * 判断类有没有实现指定的接口
+     *
+     * @param jcaClass       类
+     * @param interfaceClass 接口
+     * @return 如果类已经实现了指定接口则返回true，否则返回false
+     */
+    private static boolean hasInterface(JcaClass jcaClass, Class<?> interfaceClass) {
+        JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) trees.getTree(jcaClass.getClazz());
+        for (JCTree.JCExpression impl : classDecl.implementing) {
+            if (impl.type.toString().equals(interfaceClass.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
