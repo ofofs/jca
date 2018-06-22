@@ -62,7 +62,19 @@ public class LogProcessor extends BaseProcessor {
      * @param startTime 开始时间
      */
     private void createLogAfter(JcaMethod jcaMethod, String fieldName, String startTime) {
-        // TODO
+        List<JcaObject> args = new ArrayList<>();
+        // packageName
+        args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getPackageName()));
+        // className
+        args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getClassName()));
+        // methodName
+        args.add(JcaUtil.getValue(jcaMethod.getMethodName()));
+        // startTime
+        args.add(JcaUtil.getVar(startTime));
+        // TODO method's return express
+
+        JcaObject express = JcaUtil.method(fieldName, "logAfter", args);
+//        jcaMethod.append(express);
     }
 
     /**

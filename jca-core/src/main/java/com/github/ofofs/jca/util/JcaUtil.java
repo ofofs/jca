@@ -194,6 +194,19 @@ public final class JcaUtil {
     }
 
     /**
+     * 获取变量
+     *
+     * @param name 变量名
+     * @return 返回变量
+     */
+    public static JcaObject getVar(String name) {
+        if (name == null || name.length() == 0) {
+            return getNull();
+        }
+        return new JcaObject(treeMaker.Ident(names.fromString(name)));
+    }
+
+    /**
      * 获取一个null
      *
      * @return 返回null
