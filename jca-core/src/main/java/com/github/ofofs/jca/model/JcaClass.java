@@ -13,7 +13,6 @@ public class JcaClass {
      * 类
      */
     private Symbol.ClassSymbol clazz;
-    private Object packageName;
 
     public JcaClass(Symbol.ClassSymbol clazz) {
         this.clazz = clazz;
@@ -71,16 +70,11 @@ public class JcaClass {
 
         JcaClass jcaClass = (JcaClass) o;
 
-        if (clazz != null ? !clazz.equals(jcaClass.clazz) : jcaClass.clazz != null) {
-            return false;
-        }
-        return packageName != null ? packageName.equals(jcaClass.packageName) : jcaClass.packageName == null;
+        return clazz != null ? clazz.equals(jcaClass.clazz) : jcaClass.clazz == null;
     }
 
     @Override
     public int hashCode() {
-        int result = clazz != null ? clazz.hashCode() : 0;
-        result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
-        return result;
+        return clazz != null ? clazz.hashCode() : 0;
     }
 }
