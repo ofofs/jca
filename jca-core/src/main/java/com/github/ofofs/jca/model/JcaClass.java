@@ -59,4 +59,28 @@ public class JcaClass {
         JcaUtil.addInterface(this, interfaceClass);
         return this;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        JcaClass jcaClass = (JcaClass) o;
+
+        if (clazz != null ? !clazz.equals(jcaClass.clazz) : jcaClass.clazz != null) {
+            return false;
+        }
+        return packageName != null ? packageName.equals(jcaClass.packageName) : jcaClass.packageName == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = clazz != null ? clazz.hashCode() : 0;
+        result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
+        return result;
+    }
 }

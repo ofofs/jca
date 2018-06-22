@@ -15,6 +15,8 @@ public final class Sequence {
     private long workerId;
     private long datacenterId;
     private long sequence = 0L;
+    private long max = 31L;
+    private static long maxOffset = 5L;
     private long lastTimestamp = -1L;
 
     private static Sequence instance = new Sequence();
@@ -25,8 +27,8 @@ public final class Sequence {
     }
 
     public Sequence(long workerId, long datacenterId) {
-        if (workerId <= 31L && workerId >= 0L) {
-            if (datacenterId <= 31L && datacenterId >= 0L) {
+        if (workerId <= max && workerId >= 0L) {
+            if (datacenterId <= max && datacenterId >= 0L) {
                 this.workerId = workerId;
                 this.datacenterId = datacenterId;
             }
@@ -69,7 +71,7 @@ public final class Sequence {
         long timestamp = instance.timeGen();
         if (timestamp < instance.lastTimestamp) {
             long offset = instance.lastTimestamp - timestamp;
-            if (offset > 5L) {
+            if (offset > maxOffset) {
                 throw new RuntimeException(String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", offset));
             }
 

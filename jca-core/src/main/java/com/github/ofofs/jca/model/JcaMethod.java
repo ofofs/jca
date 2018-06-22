@@ -85,4 +85,28 @@ public class JcaMethod {
 
         return result;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        JcaMethod jcaMethod = (JcaMethod) o;
+
+        if (method != null ? !method.equals(jcaMethod.method) : jcaMethod.method != null) {
+            return false;
+        }
+        return jcaClass != null ? jcaClass.equals(jcaMethod.jcaClass) : jcaMethod.jcaClass == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = method != null ? method.hashCode() : 0;
+        result = 31 * result + (jcaClass != null ? jcaClass.hashCode() : 0);
+        return result;
+    }
 }
