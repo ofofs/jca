@@ -67,7 +67,7 @@ public class LogTest {
      */
     @Log
     public int test05(int a, int b) {
-        while (a < 10) {
+        while (a < b) {
             a++;
             System.out.println(a);
             if (a == b) {
