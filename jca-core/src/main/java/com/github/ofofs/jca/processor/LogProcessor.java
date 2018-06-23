@@ -1,5 +1,6 @@
 package com.github.ofofs.jca.processor;
 
+import com.github.ofofs.jca.annotation.Handler;
 import com.github.ofofs.jca.annotation.Log;
 import com.github.ofofs.jca.handler.impl.ConsoleLogHandler;
 import com.github.ofofs.jca.model.*;
@@ -9,6 +10,7 @@ import com.sun.tools.javac.code.Flags;
 import javax.annotation.processing.RoundEnvironment;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 日志注解处理器
@@ -130,12 +132,35 @@ public class LogProcessor extends BaseProcessor {
      * @param fieldName 字段名
      */
     private void createField(JcaClass jcaClass, String fieldName) {
-        // TODO 暂时写死ConsoleLogHandler，后面可配置
+        Class<?> handlerClass = ConsoleLogHandler.class;
+        JcaClass handler = getLogHandler();
+        if (handler != null) {
+            handlerClass = handler.getLangClass();
+        }
+
         // new ConsoleLogHandler()
-        JcaObject value = JcaCommon.instance(ConsoleLogHandler.class);
+        JcaObject value = JcaCommon.instance(jcaClass, handlerClass);
 
         // private static final ConsoleLogHandler fieldName = value;
-        JcaField jcaField = new JcaField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, ConsoleLogHandler.class, fieldName, value);
+        JcaField jcaField = new JcaField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, handlerClass, fieldName, value);
         jcaClass.insert(jcaField);
+    }
+
+    /**
+     * 获取日志句柄
+     *
+     * @return 返回日志句柄
+     */
+    private JcaClass getLogHandler() {
+        Set<JcaClass> handlers = getJcaClasses(Handler.class);
+        for (JcaClass handler : handlers) {
+            JcaAnnotation annotation = handler.getAnnotation(Handler.class);
+            Handler.Type type = (Handler.Type) annotation.getAttribute("type");
+            if (type == Handler.Type.LOG) {
+                return handler;
+            }
+        }
+
+        return null;
     }
 }

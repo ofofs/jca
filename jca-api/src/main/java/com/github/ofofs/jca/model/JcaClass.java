@@ -67,6 +67,28 @@ public class JcaClass extends JcaCommon {
     }
 
     /**
+     * 获取类
+     *
+     * @return 返回类
+     */
+    public Class<?> getLangClass() {
+        try {
+            return Class.forName(getFullName());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 获取类的全路径
+     *
+     * @return 返回类的全路径
+     */
+    public String getFullName() {
+        return clazz.fullname.toString();
+    }
+
+    /**
      * 获取类的包名
      *
      * @return 返回类的包名
@@ -295,5 +317,22 @@ public class JcaClass extends JcaCommon {
             }
         }
         return false;
+    }
+
+    /**
+     * 获取类的注解
+     *
+     * @param annotationClass 注解类型
+     * @return 返回注解
+     */
+    public JcaAnnotation getAnnotation(Class<?> annotationClass) {
+        for (JCTree.JCAnnotation anno : classDecl.mods.annotations) {
+            JCTree.JCIdent type = (JCTree.JCIdent) anno.annotationType;
+            if (annotationClass.getName().equals(((Symbol.ClassSymbol) type.sym).fullname.toString())) {
+                return new JcaAnnotation(anno);
+            }
+        }
+
+        return null;
     }
 }

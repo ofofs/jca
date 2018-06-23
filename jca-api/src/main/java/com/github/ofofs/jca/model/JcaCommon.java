@@ -48,10 +48,12 @@ public class JcaCommon {
     /**
      * 实例化一个类
      *
-     * @param clazz 类
+     * @param jcaClass 所在的类
+     * @param clazz    类
      * @return 返回类的一个实例
      */
-    public static JcaObject instance(Class<?> clazz) {
+    public static JcaObject instance(JcaClass jcaClass, Class<?> clazz) {
+        importPackage(jcaClass, clazz);
         JCTree.JCExpression typeExpr = treeMaker.Ident(names.fromString(clazz.getSimpleName()));
         return new JcaObject(treeMaker.NewClass(null, List.nil(), typeExpr, List.nil(), null));
     }
