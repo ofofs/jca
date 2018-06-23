@@ -30,6 +30,8 @@ public interface IJcaCommon {
 
     /**
      * 字段修饰符
+     *
+     * @return 返回字段修饰符
      */
     long getModifiers();
 

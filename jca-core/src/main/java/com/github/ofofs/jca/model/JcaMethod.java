@@ -86,6 +86,35 @@ public class JcaMethod {
         return result;
     }
 
+    /**
+     * 获取方法的返回类型
+     *
+     * @return 返回方法的返回类型
+     */
+    public JcaObject getReturnType() {
+        return new JcaObject(JcaUtil.getMethodDecl(this).restype);
+    }
+
+    /**
+     * 方法返回的回调
+     *
+     * @param returnValue 返回值
+     * @return 返回方法的返回值
+     */
+    public JcaObject onReturn(JcaObject returnValue) {
+        return returnValue;
+    }
+
+    /**
+     * 处理方法的返回值，遇到方法返回处，会回调onReturn。
+     *
+     * @return 返回放弃方法
+     */
+    public JcaMethod visitReturn() {
+        JcaUtil.visitReturn(this);
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

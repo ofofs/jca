@@ -21,4 +21,15 @@ public class ConsoleLogHandler implements LogHandler {
         System.out.println(msg);
     }
 
+    @Override
+    public Object logAfter(String packageName, String className, String methodName, long startTime, Object returnValue) {
+        String date = LocalDateTime.now().format(FORMAT);
+        String msg = String.format("[INFO ] %s [%s.%s]<%s> - method return：%s", date, packageName, className, methodName, JSON.toJSONString(returnValue));
+        System.out.println(msg);
+        msg = String.format("[INFO ] %s [%s.%s]<%s> - method used time：%dms", date, packageName, className, methodName, System.currentTimeMillis() - startTime);
+        System.out.println(msg);
+
+        return returnValue;
+    }
+
 }

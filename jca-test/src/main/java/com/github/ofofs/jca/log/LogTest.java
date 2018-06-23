@@ -33,6 +33,11 @@ public class LogTest {
     public void test03(int a, int b) {
         System.out.println(a);
         if (a > b) {
+            System.out.println("return;");
+            return;
+        }
+        if (a > 1) {
+            System.out.println("return;");
             return;
         }
         System.out.println(b);
@@ -51,6 +56,30 @@ public class LogTest {
             return a;
         }
         return b;
+    }
+
+    /**
+     * 测试while
+     *
+     * @param a a
+     * @param b b
+     * @return max
+     */
+    @Log
+    public int test05(int a, int b) {
+        while (a < 10) {
+            a++;
+            System.out.println(a);
+            if (a == b) {
+                System.out.println("xxxxxxxxxx");
+                return b;
+            }
+        }
+        return b;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new LogTest().test04(1, 2));
     }
 
 }

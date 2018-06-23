@@ -2,6 +2,7 @@ package com.github.ofofs.jca.util;
 
 import com.github.ofofs.jca.annotation.dev.Alpha;
 import com.github.ofofs.jca.annotation.dev.Beta;
+import com.github.ofofs.jca.constants.JcaConstants;
 import com.github.ofofs.jca.model.*;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.Trees;
@@ -14,10 +15,9 @@ import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.tree.TreeTranslator;
 import com.sun.tools.javac.util.*;
 
-import java.util.Set;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
+import java.util.Set;
 
 /**
  * jca工具类
@@ -257,6 +257,7 @@ public final class JcaUtil {
      * 设置访问修饰符
      * 1. 这个方法应该设计成，所有的 jca 对象公用。暂时先不处理(因为 jca 对象暂无共有父类)
      * 2. 注意：此方法为设置，会覆盖原来的访问修饰符
+     *
      * @param jcaClass class 信息
      * @param modifier 访问修饰符
      */
@@ -273,8 +274,9 @@ public final class JcaUtil {
 
     /**
      * 设置访问修饰符
+     *
      * @param jcMethodDecl class 信息
-     * @param modifier 访问修饰符
+     * @param modifier     访问修饰符
      */
     @Alpha
     public static void setModifier(JCTree.JCMethodDecl jcMethodDecl, final long modifier) {
@@ -289,9 +291,10 @@ public final class JcaUtil {
     /**
      * 设置无参数构造器
      * 有两种方式：
-     *  0. 如果存在，dn
-     *  1. 删除原来的 pub 无参数构造器，添加私有构造器
-     *  2. 将 pub 无参数构造器设置为 pri; (√)
+     * 0. 如果存在，dn
+     * 1. 删除原来的 pub 无参数构造器，添加私有构造器
+     * 2. 将 pub 无参数构造器设置为 pri; (√)
+     *
      * @param jcaClass jca class
      */
     @Alpha
@@ -307,7 +310,7 @@ public final class JcaUtil {
                 for (JCTree jcTree : oldList) {
                     if (isDefaultConstructor(jcTree, Modifier.PUBLIC)) {
                         //1. 设置访问符号为私有
-                        setModifier((JCTree.JCMethodDecl)jcTree, Flags.PRIVATE);
+                        setModifier((JCTree.JCMethodDecl) jcTree, Flags.PRIVATE);
                         hasPrivateDefaultConstructor = true;
                     }
                     if (isDefaultConstructor(jcTree, Modifier.PRIVATE)) {
@@ -316,7 +319,7 @@ public final class JcaUtil {
                     statements.append(jcTree);
                 }
 
-                if(!hasPrivateDefaultConstructor) {
+                if (!hasPrivateDefaultConstructor) {
                     // 添加私有构造器
                     JCTree.JCBlock block = treeMaker.Block(0L, List.nil());
                     JCTree.JCMethodDecl constructor = treeMaker.MethodDef(
@@ -339,9 +342,67 @@ public final class JcaUtil {
     }
 
     /**
+     * 获取方法的声明
+     *
+     * @param jcaMethod 方法
+     * @return 返回方法的声明
+     */
+    public static JCTree.JCMethodDecl getMethodDecl(JcaMethod jcaMethod) {
+        return (JCTree.JCMethodDecl) trees.getTree(jcaMethod.getMethod());
+    }
+
+    /**
+     * 处理方法的返回值
+     *
+     * @param jcaMethod 方法
+     */
+    public static void visitReturn(JcaMethod jcaMethod) {
+        JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) trees.getTree(jcaMethod.getMethod());
+        ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
+        List<JCTree.JCStatement> stats = methodDecl.body.stats;
+        if (stats.isEmpty()) {
+            JcaObject jcaObject = jcaMethod.onReturn(getNull());
+            statements.append(treeMaker.Exec(jcaObject.getObject()));
+        }
+        JcaObject returnType = jcaMethod.getReturnType();
+        for (int i = 0; i < stats.size(); i++) {
+            JCTree.JCStatement stat = stats.get(i);
+            ListBuffer<JCTree.JCStatement> transStats = visitReturn(jcaMethod, stat);
+            for (JCTree.JCStatement st : transStats) {
+                statements.append(st);
+            }
+
+            if (i == stats.size() - 1) {
+                if (returnType.getObject() == null || JcaConstants.RETURN_VOID.equals(returnType.getObject().toString())) {
+                    if (!(stat instanceof JCTree.JCReturn)) {
+                        JcaObject jcaObject = jcaMethod.onReturn(getNull());
+                        statements.append(treeMaker.Exec(jcaObject.getObject()));
+                    }
+                }
+            }
+        }
+
+        methodDecl.body.stats = statements.toList();
+    }
+
+    /**
+     * 强制类型转换
+     *
+     * @param type  要转换的类型
+     * @param value 值
+     * @return 返回转换后的对象
+     */
+    public static JcaObject classCast(JcaObject type, JcaObject value) {
+        if (JcaConstants.RETURN_VOID.equals(type.getObject().toString())) {
+            return value;
+        }
+        return new JcaObject(treeMaker.TypeCast(type.getObject(), value.getObject()));
+    }
+
+    /**
      * 是否为共有默认构造器
      *
-     * @param jcTree tree 信息
+     * @param jcTree   tree 信息
      * @param modifier 访问修饰符
      * @return {@code true} 是
      */
@@ -360,6 +421,7 @@ public final class JcaUtil {
 
     /**
      * 是否为构造器
+     *
      * @param jcMethodDecl 方法声明
      * @return {@code true} 是
      */
@@ -371,6 +433,7 @@ public final class JcaUtil {
 
     /**
      * 是否为无参方法
+     *
      * @param jcMethodDecl 方法声明
      * @return {@code true} 是
      */
@@ -383,15 +446,16 @@ public final class JcaUtil {
 
     /**
      * 是否为匹配修饰符的方法
+     *
      * @param jcMethodDecl 方法声明
-     * @param modifier 修饰符
+     * @param modifier     修饰符
      * @return {@code true} 是
      */
     @Alpha
     private static boolean isMatchModifierMethod(JCTree.JCMethodDecl jcMethodDecl,
                                                  Modifier modifier) {
         JCTree.JCModifiers jcModifiers = jcMethodDecl.getModifiers();
-        Set<Modifier> modifiers =  jcModifiers.getFlags();
+        Set<Modifier> modifiers = jcModifiers.getFlags();
         return modifiers.contains(modifier);
     }
 
@@ -448,7 +512,6 @@ public final class JcaUtil {
         compilationUnit.defs = imports.toList();
     }
 
-
     /**
      * 判断类有没有实现指定的接口
      *
@@ -464,5 +527,99 @@ public final class JcaUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * 处理返回值
+     *
+     * @param jcaMethod 方法
+     * @param stat      当前代码块
+     * @return 返回方法的代码块
+     */
+    private static ListBuffer<JCTree.JCStatement> visitReturn(JcaMethod jcaMethod, JCTree.JCStatement stat) {
+        ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
+        if (stat instanceof JCTree.JCReturn) {
+            JCTree.JCReturn jcReturn = (JCTree.JCReturn) stat;
+            if (jcReturn.expr == null) {
+                // return;
+                JcaObject jcaObject = jcaMethod.onReturn(getNull());
+                statements.append(treeMaker.Exec(jcaObject.getObject()));
+                statements.append(stat);
+            } else {
+                // return xxx;
+                JcaObject jcaObject = jcaMethod.onReturn(new JcaObject(jcReturn.expr));
+                jcReturn.expr = jcaObject.getObject();
+                statements.append(jcReturn);
+            }
+        } else if (stat instanceof JCTree.JCIf) {
+            JCTree.JCIf jcIf = (JCTree.JCIf) stat;
+            JCTree.JCBlock block;
+            if (jcIf.thenpart != null) {
+                if (jcIf.thenpart instanceof JCTree.JCBlock) {
+                    block = (JCTree.JCBlock) jcIf.thenpart;
+                    doBlock(jcaMethod, block);
+                    jcIf.thenpart = block;
+                } else {
+                    ListBuffer<JCTree.JCStatement> stats = visitReturn(jcaMethod, jcIf.thenpart);
+                    jcIf.thenpart = treeMaker.Block(stats.size(), stats.toList());
+                }
+            }
+            if (jcIf.elsepart != null) {
+                if (jcIf.elsepart instanceof JCTree.JCBlock) {
+                    block = (JCTree.JCBlock) jcIf.elsepart;
+                    doBlock(jcaMethod, block);
+                    jcIf.elsepart = block;
+                } else {
+                    ListBuffer<JCTree.JCStatement> stats = visitReturn(jcaMethod, jcIf.elsepart);
+                    jcIf.elsepart = treeMaker.Block(stats.size(), stats.toList());
+                }
+            }
+            statements.append(jcIf);
+        } else if (stat instanceof JCTree.JCForLoop) {
+            JCTree.JCForLoop forLoop = (JCTree.JCForLoop) stat;
+            forLoop.body = doLoop(jcaMethod, forLoop.body);
+
+            statements.append(forLoop);
+        }  else if (stat instanceof JCTree.JCDoWhileLoop) {
+            JCTree.JCDoWhileLoop doWhileLoop = (JCTree.JCDoWhileLoop) stat;
+            doWhileLoop.body = doLoop(jcaMethod, doWhileLoop.body);
+
+            statements.append(doWhileLoop);
+        } else if (stat instanceof JCTree.JCWhileLoop) {
+            JCTree.JCWhileLoop whileLoop = (JCTree.JCWhileLoop) stat;
+            whileLoop.body = doLoop(jcaMethod, whileLoop.body);
+
+            statements.append(whileLoop);
+        } else {
+            statements.append(stat);
+        }
+
+        return statements;
+    }
+
+    private static JCTree.JCStatement doLoop(JcaMethod jcaMethod, JCTree.JCStatement stat) {
+        if (stat instanceof JCTree.JCBlock) {
+            JCTree.JCBlock block = (JCTree.JCBlock) stat;
+            doBlock(jcaMethod, block);
+            stat = block;
+        } else {
+            ListBuffer<JCTree.JCStatement> stats = visitReturn(jcaMethod, stat);
+            stat = treeMaker.Block(stats.size(), stats.toList());
+        }
+
+        return stat;
+    }
+
+    private static void doBlock(JcaMethod jcaMethod, JCTree.JCBlock block) {
+        ListBuffer<JCTree.JCStatement> stats = new ListBuffer();
+        for (JCTree.JCStatement st : block.getStatements()) {
+            ListBuffer<JCTree.JCStatement> ss = visitReturn(jcaMethod, st);
+
+            for (JCTree.JCStatement stat : ss) {
+                stats.append(stat);
+            }
+        }
+
+        block.stats = stats.toList();
     }
 }

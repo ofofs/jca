@@ -20,4 +20,8 @@ public class JcaObject {
     public JCTree.JCExpression getObject() {
         return object;
     }
+
+    public void setObject(JCTree.JCExpression object) {
+        this.object = object;
+    }
 }

@@ -62,19 +62,27 @@ public class LogProcessor extends BaseProcessor {
      * @param startTime 开始时间
      */
     private void createLogAfter(JcaMethod jcaMethod, String fieldName, String startTime) {
-        List<JcaObject> args = new ArrayList<>();
-        // packageName
-        args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getPackageName()));
-        // className
-        args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getClassName()));
-        // methodName
-        args.add(JcaUtil.getValue(jcaMethod.getMethodName()));
-        // startTime
-        args.add(JcaUtil.getVar(startTime));
-        // TODO method's return express
+        new JcaMethod(jcaMethod.getMethod()) {
+            @Override
+            public JcaObject onReturn(JcaObject returnValue) {
+                List<JcaObject> args = new ArrayList<>();
+                // packageName
+                args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getPackageName()));
+                // className
+                args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getClassName()));
+                // methodName
+                args.add(JcaUtil.getValue(jcaMethod.getMethodName()));
+                // startTime
+                args.add(JcaUtil.getVar(startTime));
+                // returnValue
+                args.add(new JcaObject(returnValue.getObject()));
 
-        JcaObject express = JcaUtil.method(fieldName, "logAfter", args);
-//        jcaMethod.append(express);
+                JcaObject express = JcaUtil.method(fieldName, "logAfter", args);
+                // 替换原来的返回值
+                returnValue.setObject(JcaUtil.classCast(jcaMethod.getReturnType(), express).getObject());
+                return returnValue;
+            }
+        }.visitReturn();
     }
 
     /**
