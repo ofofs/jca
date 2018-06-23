@@ -6,7 +6,7 @@
 
 package com.github.ofofs.jca.annotation;
 
-import com.github.ofofs.jca.annotation.dev.Beta;
+import com.github.ofofs.jca.annotation.Beta;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

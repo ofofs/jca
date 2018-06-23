@@ -7,7 +7,7 @@
 package com.github.ofofs.jca.processor;
 
 import com.github.ofofs.jca.annotation.Util;
-import com.github.ofofs.jca.annotation.dev.Beta;
+import com.github.ofofs.jca.annotation.Beta;
 import com.github.ofofs.jca.model.JcaClass;
 import com.github.ofofs.jca.util.JcaUtil;
 import com.sun.tools.javac.code.Flags;

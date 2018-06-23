@@ -3,7 +3,7 @@
  * jca All rights reserved.
  */
 
-package com.github.ofofs.jca.annotation.dev;
+package com.github.ofofs.jca.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,9 +11,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p> 稳定的 </p>
+ * <p> 容易改变的 </p>
  *
- * 1. 此实现验证已经非常成熟，可以放心使用
+ * 1. 表示一个想法，刚开始萌生，后期很容易被修正/完善/移除
+ *
  * <pre> Created: 2018/6/23 上午6:49  </pre>
  * <pre> Project: jca  </pre>
  *
@@ -23,5 +24,5 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
-public @interface Stable {
+public @interface Alpha {
 }

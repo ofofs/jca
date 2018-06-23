@@ -1,7 +1,7 @@
 package com.github.ofofs.jca.util;
 
-import com.github.ofofs.jca.annotation.dev.Alpha;
-import com.github.ofofs.jca.annotation.dev.Beta;
+import com.github.ofofs.jca.annotation.Alpha;
+import com.github.ofofs.jca.annotation.Beta;
 import com.github.ofofs.jca.constants.JcaConstants;
 import com.github.ofofs.jca.model.*;
 import com.sun.source.tree.Tree;

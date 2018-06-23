@@ -3,7 +3,7 @@
  * jca All rights reserved.
  */
 
-package com.github.ofofs.jca.annotation.dev;
+package com.github.ofofs.jca.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

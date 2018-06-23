@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>jca-core</artifactId>
+    <artifactId>jca-api</artifactId>
 
-    <name>Jca Core</name>
-    <description>Java Compile Annotation Core</description>
+    <name>Jca Api</name>
+    <description>Java Compile Annotation Api</description>
 
     <build>
         <plugins>
@@ -20,11 +20,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${plugin.compiler.version}</version>
                 <configuration>
                     <source>${plugin.compiler.level}</source>
                     <target>${plugin.compiler.level}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <compilerArgument>-proc:none</compilerArgument>
                 </configuration>
             </plugin>
         </plugins>
@@ -32,19 +32,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jca-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>sun.jdk</groupId>
             <artifactId>tools</artifactId>
             <version>${tools.version}</version>
             <scope>system</scope>
             <systemPath>${java.home}/../lib/tools.jar</systemPath>
         </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-        </dependency>
     </dependencies>
+
 </project>

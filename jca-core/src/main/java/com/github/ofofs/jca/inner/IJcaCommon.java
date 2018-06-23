@@ -6,7 +6,7 @@
 
 package com.github.ofofs.jca.inner;
 
-import com.github.ofofs.jca.annotation.dev.Alpha;
+import com.github.ofofs.jca.annotation.Alpha;
 import com.sun.tools.javac.tree.JCTree;
 
 /**

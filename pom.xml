@@ -12,6 +12,7 @@
     <modules>
         <module>jca-core</module>
         <module>jca-test</module>
+        <module>jca-api</module>
     </modules>
 
     <name>Jca</name>
@@ -70,6 +71,11 @@
     <dependencyManagement>
         <dependencies>
             <!--Project-->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jca-api</artifactId>
+                <version>${project.build.varsion}</version>
+            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jca-core</artifactId>
