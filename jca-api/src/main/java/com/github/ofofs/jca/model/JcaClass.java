@@ -25,8 +25,14 @@ public class JcaClass extends JcaCommon {
      */
     private Symbol.ClassSymbol clazz;
 
+    /**
+     * 类的定义
+     */
+    private JCTree.JCClassDecl classDecl;
+
     public JcaClass(Symbol.ClassSymbol clazz) {
         this.clazz = clazz;
+        classDecl = (JCTree.JCClassDecl) trees.getTree(clazz);
     }
 
     /**
@@ -36,7 +42,6 @@ public class JcaClass extends JcaCommon {
      * @return 返回当前类
      */
     public JcaClass insert(JcaField jcaField) {
-        JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) trees.getTree(this.getClazz());
         ListBuffer<JCTree> statements = new ListBuffer<>();
 
         if (existsField(jcaField.getFieldName())) {
@@ -93,8 +98,7 @@ public class JcaClass extends JcaCommon {
             // 导包（会自动去重）
             importPackage(this, interfaceClass);
 
-            JCTree.JCClassDecl clazz = (JCTree.JCClassDecl) trees.getTree(this.getClazz());
-            java.util.List<JCTree.JCExpression> implementing = clazz.implementing;
+            java.util.List<JCTree.JCExpression> implementing = classDecl.implementing;
             ListBuffer<JCTree.JCExpression> statements = new ListBuffer<>();
             for (JCTree.JCExpression impl : implementing) {
                 statements.append(impl);
@@ -102,7 +106,7 @@ public class JcaClass extends JcaCommon {
 
             Symbol.ClassSymbol sym = new Symbol.ClassSymbol(Sequence.nextLong(), names.fromString(interfaceClass.getSimpleName()), null);
             statements.append(treeMaker.Ident(sym));
-            clazz.implementing = statements.toList();
+            classDecl.implementing = statements.toList();
         }
         return this;
     }
@@ -128,7 +132,6 @@ public class JcaClass extends JcaCommon {
      * @param modifier 修饰符
      */
     public void setModifier(int modifier) {
-        JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) trees.getTree(clazz);
         classDecl.mods = treeMaker.Modifiers(modifier);
     }
 
@@ -268,7 +271,6 @@ public class JcaClass extends JcaCommon {
      * @return 如果类已经实现了指定接口则返回true，否则返回false
      */
     private boolean hasInterface(Class<?> interfaceClass) {
-        JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) trees.getTree(this.getClazz());
         for (JCTree.JCExpression impl : classDecl.implementing) {
             if (impl.type.toString().equals(interfaceClass.getName())) {
                 return true;
@@ -284,7 +286,6 @@ public class JcaClass extends JcaCommon {
      * @return 若存在返回true，否则返回false
      */
     private boolean existsField(String fieldName) {
-        JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) trees.getTree(this.getClazz());
         for (JCTree jcTree : classDecl.defs) {
             if (jcTree.getKind() == Tree.Kind.VARIABLE) {
                 JCTree.JCVariableDecl var = (JCTree.JCVariableDecl) jcTree;
