@@ -3,7 +3,6 @@ package com.github.ofofs.jca.processor;
 import com.github.ofofs.jca.annotation.Log;
 import com.github.ofofs.jca.handler.impl.ConsoleLogHandler;
 import com.github.ofofs.jca.model.*;
-import com.github.ofofs.jca.util.JcaUtil;
 import com.github.ofofs.jca.util.Sequence;
 import com.sun.tools.javac.code.Flags;
 
@@ -67,19 +66,19 @@ public class LogProcessor extends BaseProcessor {
             public JcaObject onReturn(JcaObject returnValue) {
                 List<JcaObject> args = new ArrayList<>();
                 // packageName
-                args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getPackageName()));
+                args.add(JcaCommon.getValue(jcaMethod.getJcaClass().getPackageName()));
                 // className
-                args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getClassName()));
+                args.add(JcaCommon.getValue(jcaMethod.getJcaClass().getClassName()));
                 // methodName
-                args.add(JcaUtil.getValue(jcaMethod.getMethodName()));
+                args.add(JcaCommon.getValue(jcaMethod.getMethodName()));
                 // startTime
-                args.add(JcaUtil.getVar(startTime));
+                args.add(JcaCommon.getVar(startTime));
                 // returnValue
                 args.add(new JcaObject(returnValue.getObject()));
 
-                JcaObject express = JcaUtil.method(fieldName, "logAfter", args);
+                JcaObject express = JcaCommon.method(fieldName, "logAfter", args);
                 // 替换原来的返回值
-                returnValue.setObject(JcaUtil.classCast(jcaMethod.getReturnType(), express).getObject());
+                returnValue.setObject(JcaCommon.classCast(jcaMethod.getReturnType(), express).getObject());
                 return returnValue;
             }
         }.visitReturn();
@@ -95,7 +94,7 @@ public class LogProcessor extends BaseProcessor {
         String varName = Sequence.nextString("var");
 
         // System.currentTimeMillis()
-        JcaObject value = JcaUtil.staticMethod(jcaMethod.getJcaClass(), System.class, "currentTimeMillis");
+        JcaObject value = JcaClass.staticMethod(jcaMethod.getJcaClass(), System.class, "currentTimeMillis");
 
         // Long startTime = value;
         JcaVariable jcaVariable = new JcaVariable(Long.class, varName, value);
@@ -112,15 +111,15 @@ public class LogProcessor extends BaseProcessor {
     private void createLogBefore(JcaMethod jcaMethod, String fieldName) {
         List<JcaObject> args = new ArrayList<>();
         // packageName
-        args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getPackageName()));
+        args.add(JcaCommon.getValue(jcaMethod.getJcaClass().getPackageName()));
         // className
-        args.add(JcaUtil.getValue(jcaMethod.getJcaClass().getClassName()));
+        args.add(JcaCommon.getValue(jcaMethod.getJcaClass().getClassName()));
         // methodName
-        args.add(JcaUtil.getValue(jcaMethod.getMethodName()));
+        args.add(JcaCommon.getValue(jcaMethod.getMethodName()));
         // method's args
         args.addAll(jcaMethod.getArgs());
 
-        JcaObject express = JcaUtil.method(fieldName, "logBefore", args);
+        JcaObject express = JcaCommon.method(fieldName, "logBefore", args);
         jcaMethod.insert(express);
     }
 
@@ -133,7 +132,7 @@ public class LogProcessor extends BaseProcessor {
     private void createField(JcaClass jcaClass, String fieldName) {
         // TODO 暂时写死ConsoleLogHandler，后面可配置
         // new ConsoleLogHandler()
-        JcaObject value = JcaUtil.instance(ConsoleLogHandler.class);
+        JcaObject value = JcaCommon.instance(ConsoleLogHandler.class);
 
         // private static final ConsoleLogHandler fieldName = value;
         JcaField jcaField = new JcaField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, ConsoleLogHandler.class, fieldName, value);

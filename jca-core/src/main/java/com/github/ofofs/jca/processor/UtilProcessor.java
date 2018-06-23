@@ -9,7 +9,6 @@ package com.github.ofofs.jca.processor;
 import com.github.ofofs.jca.annotation.Util;
 import com.github.ofofs.jca.annotation.Beta;
 import com.github.ofofs.jca.model.JcaClass;
-import com.github.ofofs.jca.util.JcaUtil;
 import com.sun.tools.javac.code.Flags;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -47,11 +46,10 @@ public class UtilProcessor extends BaseProcessor {
     private void process(JcaClass jcaClass) {
         // 设置访问符号为 final
         // ps: 这里添加一个修饰符应该也可以。后期可调整
-        JcaUtil.setModifier(jcaClass,
-                Flags.PUBLIC | Flags.FINAL);
+        jcaClass.setModifier(Flags.PUBLIC | Flags.FINAL);
 
         // 设置无参数私有构造器
-        JcaUtil.setNoArgPrivateConstructor(jcaClass);
+        jcaClass.setNoArgPrivateConstructor();
     }
 
 }

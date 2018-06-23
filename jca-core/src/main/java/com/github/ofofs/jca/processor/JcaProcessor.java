@@ -1,11 +1,10 @@
 package com.github.ofofs.jca.processor;
 
-import com.github.ofofs.jca.util.JcaUtil;
+import com.github.ofofs.jca.model.JcaCommon;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
-
 import java.util.Set;
 
 /**
@@ -20,7 +19,7 @@ public class JcaProcessor extends AbstractProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
-        JcaUtil.init(env);
+        JcaCommon.init(env);
     }
 
     @Override

@@ -2,9 +2,9 @@ package com.github.ofofs.jca.processor;
 
 import com.github.ofofs.jca.annotation.Serial;
 import com.github.ofofs.jca.model.JcaClass;
+import com.github.ofofs.jca.model.JcaCommon;
 import com.github.ofofs.jca.model.JcaField;
 import com.github.ofofs.jca.model.JcaObject;
-import com.github.ofofs.jca.util.JcaUtil;
 import com.github.ofofs.jca.util.Sequence;
 import com.sun.tools.javac.code.Flags;
 
@@ -49,7 +49,7 @@ public class SerialProcessor extends BaseProcessor {
      * @param jcaClass 类
      */
     private void createSerialVersionUID(JcaClass jcaClass) {
-        JcaObject value = JcaUtil.getValue(Sequence.nextLong());
+        JcaObject value = JcaCommon.getValue(Sequence.nextLong());
 
         // private static final Long serialVersionUID = value;
         JcaField jcaField = new JcaField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, Long.class, "serialVersionUID", value);
