@@ -5,6 +5,7 @@ import com.github.ofofs.jca.util.JcaUtil;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
+
 import java.util.Set;
 
 /**
@@ -13,7 +14,10 @@ import java.util.Set;
  * @author kangyonggan
  * @since 6/22/18
  */
-@SupportedAnnotationTypes("com.github.ofofs.jca.annotation.Log")
+@SupportedAnnotationTypes({
+    "com.github.ofofs.jca.annotation.Log",
+    "com.github.ofofs.jca.annotation.Util",
+})
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class JcaProcessor extends AbstractProcessor {
 
@@ -28,6 +32,8 @@ public class JcaProcessor extends AbstractProcessor {
         new LogProcessor(env).process();
         // 序列化
         new SerialProcessor(env).process();
+        // 工具类处理
+        new UtilProcessor(env).process();
         return true;
     }
 

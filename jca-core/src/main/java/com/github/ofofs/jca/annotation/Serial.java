@@ -7,8 +7,11 @@ import java.lang.annotation.Target;
 
 /**
  * 序列化注解。
- *
+ * 作用：
+ * 1. implement Serializable
+ * 2. 生成 serialVersionUID
  * @author kangyonggan
+ * @author houbinbin
  * @since 6/22/18
  */
 @Retention(RetentionPolicy.SOURCE)

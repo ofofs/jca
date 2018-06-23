@@ -1,16 +1,23 @@
 package com.github.ofofs.jca.util;
 
+import com.github.ofofs.jca.annotation.dev.Alpha;
+import com.github.ofofs.jca.annotation.dev.Beta;
 import com.github.ofofs.jca.model.*;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.Trees;
+import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
+import com.sun.tools.javac.tree.TreeTranslator;
 import com.sun.tools.javac.util.*;
 
+import java.util.Set;
+
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Modifier;
 
 /**
  * jca工具类
@@ -19,6 +26,12 @@ import javax.annotation.processing.ProcessingEnvironment;
  * @since 6/22/18
  */
 public final class JcaUtil {
+
+    /**
+     * 构造器名称
+     */
+    @Beta
+    private static final String CONSTRUCTOR_NAME = "<init>";
 
     /**
      * 语法树
@@ -238,6 +251,148 @@ public final class JcaUtil {
             statements.append(treeMaker.Ident(sym));
             clazz.implementing = statements.toList();
         }
+    }
+
+    /**
+     * 设置访问修饰符
+     * 1. 这个方法应该设计成，所有的 jca 对象公用。暂时先不处理(因为 jca 对象暂无共有父类)
+     * 2. 注意：此方法为设置，会覆盖原来的访问修饰符
+     * @param jcaClass class 信息
+     * @param modifier 访问修饰符
+     */
+    @Alpha
+    public static void setModifier(JcaClass jcaClass, final long modifier) {
+        JCTree tree = (JCTree) trees.getTree(jcaClass.getClazz());
+        tree.accept(new TreeTranslator() {
+            @Override
+            public void visitClassDef(JCTree.JCClassDecl jcClassDecl) {
+                jcClassDecl.mods = treeMaker.Modifiers(modifier, List.nil());
+            }
+        });
+    }
+
+    /**
+     * 设置访问修饰符
+     * @param jcMethodDecl class 信息
+     * @param modifier 访问修饰符
+     */
+    @Alpha
+    public static void setModifier(JCTree.JCMethodDecl jcMethodDecl, final long modifier) {
+        jcMethodDecl.accept(new TreeTranslator() {
+            @Override
+            public void visitMethodDef(JCTree.JCMethodDecl jcMethodDecl) {
+                jcMethodDecl.mods = treeMaker.Modifiers(modifier, List.nil());
+            }
+        });
+    }
+
+    /**
+     * 设置无参数构造器
+     * 有两种方式：
+     *  0. 如果存在，dn
+     *  1. 删除原来的 pub 无参数构造器，添加私有构造器
+     *  2. 将 pub 无参数构造器设置为 pri; (√)
+     * @param jcaClass jca class
+     */
+    @Alpha
+    public static void setNoArgPrivateConstructor(JcaClass jcaClass) {
+        JCTree tree = (JCTree) trees.getTree(jcaClass.getClazz());
+        tree.accept(new TreeTranslator() {
+            @Override
+            public void visitClassDef(JCTree.JCClassDecl jcClassDecl) {
+                List<JCTree> oldList = this.translate(jcClassDecl.defs);
+                ListBuffer<JCTree> statements = new ListBuffer<>();
+
+                boolean hasPrivateDefaultConstructor = false;
+                for (JCTree jcTree : oldList) {
+                    if (isDefaultConstructor(jcTree, Modifier.PUBLIC)) {
+                        //1. 设置访问符号为私有
+                        setModifier((JCTree.JCMethodDecl)jcTree, Flags.PRIVATE);
+                        hasPrivateDefaultConstructor = true;
+                    }
+                    if (isDefaultConstructor(jcTree, Modifier.PRIVATE)) {
+                        hasPrivateDefaultConstructor = true;
+                    }
+                    statements.append(jcTree);
+                }
+
+                if(!hasPrivateDefaultConstructor) {
+                    // 添加私有构造器
+                    JCTree.JCBlock block = treeMaker.Block(0L, List.nil());
+                    JCTree.JCMethodDecl constructor = treeMaker.MethodDef(
+                            treeMaker.Modifiers(Flags.PRIVATE, List.nil()),
+                            names.fromString(CONSTRUCTOR_NAME),
+                            null,
+                            List.nil(),
+                            List.nil(),
+                            List.nil(),
+                            block,
+                            null);
+
+                    statements.append(constructor);
+                    //更新
+                    jcClassDecl.defs = statements.toList();
+                }
+                this.result = jcClassDecl;
+            }
+        });
+    }
+
+    /**
+     * 是否为共有默认构造器
+     *
+     * @param jcTree tree 信息
+     * @param modifier 访问修饰符
+     * @return {@code true} 是
+     */
+    @Alpha
+    private static boolean isDefaultConstructor(JCTree jcTree, Modifier modifier) {
+
+        if (jcTree.getKind() == Tree.Kind.METHOD) {
+            JCTree.JCMethodDecl jcMethodDecl = (JCTree.JCMethodDecl) jcTree;
+            return isConstructor(jcMethodDecl)
+                    && isNoArgsMethod(jcMethodDecl)
+                    && isMatchModifierMethod(jcMethodDecl, modifier);
+        }
+
+        return false;
+    }
+
+    /**
+     * 是否为构造器
+     * @param jcMethodDecl 方法声明
+     * @return {@code true} 是
+     */
+    @Alpha
+    private static boolean isConstructor(JCTree.JCMethodDecl jcMethodDecl) {
+        String name = jcMethodDecl.name.toString();
+        return CONSTRUCTOR_NAME.equals(name);
+    }
+
+    /**
+     * 是否为无参方法
+     * @param jcMethodDecl 方法声明
+     * @return {@code true} 是
+     */
+    @Alpha
+    private static boolean isNoArgsMethod(JCTree.JCMethodDecl jcMethodDecl) {
+        List<JCTree.JCVariableDecl> jcVariableDeclList = jcMethodDecl.getParameters();
+        return jcVariableDeclList == null
+                || jcVariableDeclList.size() == 0;
+    }
+
+    /**
+     * 是否为匹配修饰符的方法
+     * @param jcMethodDecl 方法声明
+     * @param modifier 修饰符
+     * @return {@code true} 是
+     */
+    @Alpha
+    private static boolean isMatchModifierMethod(JCTree.JCMethodDecl jcMethodDecl,
+                                                 Modifier modifier) {
+        JCTree.JCModifiers jcModifiers = jcMethodDecl.getModifiers();
+        Set<Modifier> modifiers =  jcModifiers.getFlags();
+        return modifiers.contains(modifier);
     }
 
     /**
