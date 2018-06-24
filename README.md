@@ -6,7 +6,7 @@ Jca 是 Java 编译时注解(Java Compile Annotation)，类似于 [Lombok](https
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.ofofs/jca/badge.svg)](http://mvnrepository.com/artifact/com.github.ofofs/jca)
 [![Build Status](https://www.travis-ci.org/ofofs/jca.svg)](https://www.travis-ci.org/ofofs/jca)
-[![Coverage Status](https://coveralls.io/repos/github/ofofs/jca.svg)](https://coveralls.io/github/ofofs/jca)
+[![Coverage Status](https://coveralls.io/repos/github/ofofs/jca/badge.svg?branch=master)](https://coveralls.io/github/ofofs/jca?branch=master)
 
 
 ## 优势
