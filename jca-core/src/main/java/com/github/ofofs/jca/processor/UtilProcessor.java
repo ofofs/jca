@@ -26,7 +26,7 @@ import javax.annotation.processing.RoundEnvironment;
  * @since JDK 1.7
  */
 @Beta
-public class UtilProcessor extends AbstractProcessor {
+public class UtilProcessor extends AbstractJcaProcessor {
 
     protected UtilProcessor(RoundEnvironment env) {
         super(env);
