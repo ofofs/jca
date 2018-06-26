@@ -46,7 +46,6 @@ public class CacheProcessor extends AbstractJcaProcessor {
 
     }
 
-
     /**
      * private static final MemoryCacheHandler fieldName = new MemoryCacheHandler();
      *
