@@ -1,7 +1,7 @@
 package com.github.ofofs.jca.processor;
 
-import com.github.ofofs.jca.annotation.Cache;
 import com.github.ofofs.jca.annotation.Handler;
+import com.github.ofofs.jca.annotation.Log;
 import com.github.ofofs.jca.handler.impl.MemoryCacheHandler;
 import com.github.ofofs.jca.model.*;
 import com.github.ofofs.jca.util.Sequence;
@@ -10,25 +10,25 @@ import com.sun.tools.javac.code.Flags;
 import javax.annotation.processing.RoundEnvironment;
 
 /**
- * 缓存注解处理器
+ * 日志注解处理器
  *
  * @author kangyonggan
  * @since 6/22/18
  */
-public class LogProcessor extends AbstractJcaProcessor {
+public class CacheProcessor extends AbstractJcaProcessor {
 
-    LogProcessor(RoundEnvironment env) {
+    CacheProcessor(RoundEnvironment env) {
         super(env);
     }
 
     /**
-     * 处理缓存注解
+     * 处理日志注解
      */
     @Override
     protected void process() {
-        if (isEnable(Handler.Type.CACHE)) {
+        if (isEnable(Handler.Type.LOG)) {
             String fieldName = Sequence.nextString("field");
-            for (JcaMethod jcaMethod : getJcaMethods(Cache.class)) {
+            for (JcaMethod jcaMethod : getJcaMethods(Log.class)) {
                 process(jcaMethod, fieldName);
             }
         }
@@ -45,6 +45,7 @@ public class LogProcessor extends AbstractJcaProcessor {
         createField(jcaMethod.getJcaClass(), fieldName);
 
     }
+
 
     /**
      * private static final MemoryCacheHandler fieldName = new MemoryCacheHandler();

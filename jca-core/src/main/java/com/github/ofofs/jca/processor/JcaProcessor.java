@@ -26,7 +26,9 @@ public class JcaProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         // 序列化
         new SerialProcessor(env).process();
-        // 日志
+        // 缓存
+        new CacheProcessor(env).process();
+        // 日志(日志注解需要在缓存注解后面处理)
         new LogProcessor(env).process();
         // 工具类处理
         new UtilProcessor(env).process();
