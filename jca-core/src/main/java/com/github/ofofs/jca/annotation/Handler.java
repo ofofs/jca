@@ -14,6 +14,13 @@ import java.lang.annotation.Target;
 public @interface Handler {
 
     /**
+     * 注解是否可用
+     *
+     * @return 默认注解可用
+     */
+    boolean enable() default true;
+
+    /**
      * 类型
      *
      * @return 类型枚举

@@ -14,7 +14,7 @@ public class JcaField {
     /**
      * 字段类型
      */
-    private Class<?> typeClass;
+    private String typeClass;
 
     /**
      * 字段名称
@@ -28,6 +28,13 @@ public class JcaField {
 
     public JcaField(int modifiers, Class<?> typeClass, String fieldName, JcaObject value) {
         this.modifiers = modifiers;
+        this.typeClass = typeClass.getName();
+        this.fieldName = fieldName;
+        this.value = value;
+    }
+
+    public JcaField(int modifiers, String typeClass, String fieldName, JcaObject value) {
+        this.modifiers = modifiers;
         this.typeClass = typeClass;
         this.fieldName = fieldName;
         this.value = value;
@@ -37,7 +44,7 @@ public class JcaField {
         return modifiers;
     }
 
-    public Class<?> getTypeClass() {
+    public String getTypeClass() {
         return typeClass;
     }
 

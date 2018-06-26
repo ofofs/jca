@@ -53,8 +53,19 @@ public class JcaCommon {
      * @return 返回类的一个实例
      */
     public static JcaObject instance(JcaClass jcaClass, Class<?> clazz) {
+        return instance(jcaClass, clazz.getName());
+    }
+
+    /**
+     * 实例化一个类
+     *
+     * @param jcaClass 所在的类
+     * @param clazz    类
+     * @return 返回类的一个实例
+     */
+    public static JcaObject instance(JcaClass jcaClass, String clazz) {
         importPackage(jcaClass, clazz);
-        JCTree.JCExpression typeExpr = treeMaker.Ident(names.fromString(clazz.getSimpleName()));
+        JCTree.JCExpression typeExpr = treeMaker.Ident(names.fromString(clazz.substring(clazz.lastIndexOf(".") + 1)));
         return new JcaObject(treeMaker.NewClass(null, List.nil(), typeExpr, List.nil(), null));
     }
 
@@ -64,10 +75,10 @@ public class JcaCommon {
      * @param jcaClass    所在的类
      * @param importClass 要导入的包
      */
-    public static void importPackage(JcaClass jcaClass, Class<?> importClass) {
+    public static void importPackage(JcaClass jcaClass, String importClass) {
         JCTree.JCCompilationUnit compilationUnit = (JCTree.JCCompilationUnit) trees.getPath(jcaClass.getClazz()).getCompilationUnit();
 
-        JCTree.JCFieldAccess fieldAccess = treeMaker.Select(treeMaker.Ident(names.fromString(importClass.getPackage().getName())), names.fromString(importClass.getSimpleName()));
+        JCTree.JCFieldAccess fieldAccess = treeMaker.Select(treeMaker.Ident(names.fromString(importClass.substring(0, importClass.lastIndexOf(".")))), names.fromString(importClass.substring(importClass.lastIndexOf(".") + 1)));
         JCTree.JCImport jcImport = treeMaker.Import(fieldAccess, false);
 
         ListBuffer<JCTree> imports = new ListBuffer<>();
@@ -78,6 +89,16 @@ public class JcaCommon {
         }
 
         compilationUnit.defs = imports.toList();
+    }
+
+    /**
+     * 导入一个包
+     *
+     * @param jcaClass    所在的类
+     * @param importClass 要导入的包
+     */
+    public static void importPackage(JcaClass jcaClass, Class<?> importClass) {
+        importPackage(jcaClass, importClass.getName());
     }
 
     /**
@@ -120,9 +141,19 @@ public class JcaCommon {
      * @param typeClass 类型
      * @return 返回一个类型
      */
-    public static JCTree.JCIdent getType(Class<?> typeClass) {
-        Symbol.ClassSymbol sym = new Symbol.ClassSymbol(Sequence.nextLong(), names.fromString(typeClass.getSimpleName()), null);
+    public static JCTree.JCIdent getType(String typeClass) {
+        Symbol.ClassSymbol sym = new Symbol.ClassSymbol(Sequence.nextLong(), names.fromString(typeClass.substring(typeClass.lastIndexOf(".") + 1)), null);
         return treeMaker.Ident(sym);
+    }
+
+    /**
+     * 获取一个类型
+     *
+     * @param typeClass 类型
+     * @return 返回一个类型
+     */
+    public static JCTree.JCIdent getType(Class<?> typeClass) {
+        return getType(typeClass.getName());
     }
 
     /**

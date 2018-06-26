@@ -44,15 +44,15 @@ public class LogProcessor extends BaseProcessor {
     private void process(JcaMethod jcaMethod, String fieldName) {
         // 给方法所在的类创建一个字段
         createField(jcaMethod.getJcaClass(), fieldName);
-
-        // 创建代码块logBefore
-        createLogBefore(jcaMethod, fieldName);
-
-        // 创建代码块startTime
-        String startTime = createStartTime(jcaMethod);
-
-        // 创建代码块logAfter
-        createLogAfter(jcaMethod, fieldName, startTime);
+//
+//        // 创建代码块logBefore
+//        createLogBefore(jcaMethod, fieldName);
+//
+//        // 创建代码块startTime
+//        String startTime = createStartTime(jcaMethod);
+//
+//        // 创建代码块logAfter
+//        createLogAfter(jcaMethod, fieldName, startTime);
     }
 
     /**
@@ -132,10 +132,10 @@ public class LogProcessor extends BaseProcessor {
      * @param fieldName 字段名
      */
     private void createField(JcaClass jcaClass, String fieldName) {
-        Class<?> handlerClass = ConsoleLogHandler.class;
+        String handlerClass = ConsoleLogHandler.class.getName();
         JcaClass handler = getLogHandler();
         if (handler != null) {
-            handlerClass = handler.getLangClass();
+            handlerClass = handler.getFullName();
         }
 
         // new ConsoleLogHandler()
@@ -154,9 +154,8 @@ public class LogProcessor extends BaseProcessor {
     private JcaClass getLogHandler() {
         Set<JcaClass> handlers = getJcaClasses(Handler.class);
         for (JcaClass handler : handlers) {
-            JcaAnnotation annotation = handler.getAnnotation(Handler.class);
-            Handler.Type type = (Handler.Type) annotation.getAttribute("type");
-            if (type == Handler.Type.LOG) {
+            Handler anno = handler.getClazz().getAnnotation(Handler.class);
+            if (anno.type() == Handler.Type.LOG) {
                 return handler;
             }
         }
