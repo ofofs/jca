@@ -2,6 +2,7 @@ package com.github.ofofs.jca.processor;
 
 import com.github.ofofs.jca.annotation.Handler;
 import com.github.ofofs.jca.model.JcaClass;
+import com.github.ofofs.jca.util.PropertiesUtil;
 
 import javax.annotation.processing.RoundEnvironment;
 import java.util.Set;
@@ -41,6 +42,7 @@ public abstract class CoreProcessor extends BaseProcessor {
      * @return 返回true代表可用，返回false代表不可用(默认可用)
      */
     protected boolean isEnable(Handler.Type type) {
+        // 优先使用@Handler注解
         Set<JcaClass> handlers = getJcaClasses(Handler.class);
         for (JcaClass handler : handlers) {
             Handler anno = handler.getClazz().getAnnotation(Handler.class);
@@ -49,6 +51,7 @@ public abstract class CoreProcessor extends BaseProcessor {
             }
         }
 
-        return true;
+        // 没有@Handler的情况，以配置文件jca.properties为准， 缺省为true
+        return PropertiesUtil.isEnable(type);
     }
 }
