@@ -6,8 +6,9 @@
 
 package com.github.ofofs.jca.processor;
 
-import com.github.ofofs.jca.annotation.Util;
 import com.github.ofofs.jca.annotation.Beta;
+import com.github.ofofs.jca.annotation.Handler;
+import com.github.ofofs.jca.annotation.Util;
 import com.github.ofofs.jca.model.JcaClass;
 import com.sun.tools.javac.code.Flags;
 
@@ -15,17 +16,17 @@ import javax.annotation.processing.RoundEnvironment;
 
 /**
  * <p> util 实现 </p>
- *
+ * <p>
  * <pre> Created: 2018/6/23 上午6:03  </pre>
  * <pre> Project: jca  </pre>
  *
  * @author houbinbin
  * @version 1.0.0
- * @since JDK 1.7
  * @see com.github.ofofs.jca.annotation.Util 工具类注解
+ * @since JDK 1.7
  */
 @Beta
-public class UtilProcessor extends BaseProcessor {
+public class UtilProcessor extends CoreProcessor {
 
     protected UtilProcessor(RoundEnvironment env) {
         super(env);
@@ -33,8 +34,10 @@ public class UtilProcessor extends BaseProcessor {
 
     @Override
     protected void process() {
-        for (JcaClass jcaClass : getJcaClasses(Util.class)) {
-            process(jcaClass);
+        if (isEnable(Handler.Type.UTIL)) {
+            for (JcaClass jcaClass : getJcaClasses(Util.class)) {
+                process(jcaClass);
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.github.ofofs.jca.processor;
 
+import com.github.ofofs.jca.annotation.Handler;
 import com.github.ofofs.jca.annotation.Serial;
 import com.github.ofofs.jca.model.JcaClass;
 import com.github.ofofs.jca.model.JcaCommon;
@@ -17,7 +18,7 @@ import java.io.Serializable;
  * @author kangyonggan
  * @since 6/23/18
  */
-public class SerialProcessor extends BaseProcessor {
+public class SerialProcessor extends CoreProcessor {
 
     protected SerialProcessor(RoundEnvironment env) {
         super(env);
@@ -25,8 +26,10 @@ public class SerialProcessor extends BaseProcessor {
 
     @Override
     protected void process() {
-        for (JcaClass jcaClass : getJcaClasses(Serial.class)) {
-            process(jcaClass);
+        if (isEnable(Handler.Type.SERIAL)) {
+            for (JcaClass jcaClass : getJcaClasses(Serial.class)) {
+                process(jcaClass);
+            }
         }
     }
 

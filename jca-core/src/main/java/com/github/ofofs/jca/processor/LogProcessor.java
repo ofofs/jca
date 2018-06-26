@@ -10,7 +10,6 @@ import com.sun.tools.javac.code.Flags;
 import javax.annotation.processing.RoundEnvironment;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 日志注解处理器
@@ -18,7 +17,7 @@ import java.util.Set;
  * @author kangyonggan
  * @since 6/22/18
  */
-public class LogProcessor extends BaseProcessor {
+public class LogProcessor extends CoreProcessor {
 
     LogProcessor(RoundEnvironment env) {
         super(env);
@@ -29,9 +28,11 @@ public class LogProcessor extends BaseProcessor {
      */
     @Override
     protected void process() {
-        String fieldName = Sequence.nextString("field");
-        for (JcaMethod jcaMethod : getJcaMethods(Log.class)) {
-            process(jcaMethod, fieldName);
+        if (isEnable(Handler.Type.LOG)) {
+            String fieldName = Sequence.nextString("field");
+            for (JcaMethod jcaMethod : getJcaMethods(Log.class)) {
+                process(jcaMethod, fieldName);
+            }
         }
     }
 
@@ -133,7 +134,7 @@ public class LogProcessor extends BaseProcessor {
      */
     private void createField(JcaClass jcaClass, String fieldName) {
         String handlerClass = ConsoleLogHandler.class.getName();
-        JcaClass handler = getLogHandler();
+        JcaClass handler = getHandler(Handler.Type.LOG);
         if (handler != null) {
             handlerClass = handler.getFullName();
         }
@@ -144,22 +145,5 @@ public class LogProcessor extends BaseProcessor {
         // private static final ConsoleLogHandler fieldName = value;
         JcaField jcaField = new JcaField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, handlerClass, fieldName, value);
         jcaClass.insert(jcaField);
-    }
-
-    /**
-     * 获取日志句柄
-     *
-     * @return 返回日志句柄
-     */
-    private JcaClass getLogHandler() {
-        Set<JcaClass> handlers = getJcaClasses(Handler.class);
-        for (JcaClass handler : handlers) {
-            Handler anno = handler.getClazz().getAnnotation(Handler.class);
-            if (anno.type() == Handler.Type.LOG) {
-                return handler;
-            }
-        }
-
-        return null;
     }
 }

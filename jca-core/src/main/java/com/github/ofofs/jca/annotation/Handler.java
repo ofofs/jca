@@ -35,7 +35,15 @@ public @interface Handler {
         /**
          * 缓存
          */
-        CACHE
+        CACHE,
+        /**
+         * 序列化
+         */
+        SERIAL,
+        /**
+         * 工具类
+         */
+        UTIL
     }
 
 }
