@@ -11,9 +11,9 @@ import java.util.Set;
  * @author kangyonggan
  * @since 6/26/18
  */
-public abstract class CoreProcessor extends BaseProcessor {
+public abstract class AbstractProcessor extends BaseProcessor {
 
-    protected CoreProcessor(RoundEnvironment env) {
+    protected AbstractProcessor(RoundEnvironment env) {
         super(env);
     }
 

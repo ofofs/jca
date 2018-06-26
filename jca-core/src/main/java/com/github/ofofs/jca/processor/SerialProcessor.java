@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @author kangyonggan
  * @since 6/23/18
  */
-public class SerialProcessor extends CoreProcessor {
+public class SerialProcessor extends AbstractProcessor {
 
     protected SerialProcessor(RoundEnvironment env) {
         super(env);

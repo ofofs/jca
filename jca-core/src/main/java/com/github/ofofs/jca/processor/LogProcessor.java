@@ -17,7 +17,7 @@ import java.util.List;
  * @author kangyonggan
  * @since 6/22/18
  */
-public class LogProcessor extends CoreProcessor {
+public class LogProcessor extends AbstractProcessor {
 
     LogProcessor(RoundEnvironment env) {
         super(env);
