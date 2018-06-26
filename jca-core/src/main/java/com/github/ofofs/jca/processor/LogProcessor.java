@@ -44,15 +44,15 @@ public class LogProcessor extends BaseProcessor {
     private void process(JcaMethod jcaMethod, String fieldName) {
         // 给方法所在的类创建一个字段
         createField(jcaMethod.getJcaClass(), fieldName);
-//
-//        // 创建代码块logBefore
-//        createLogBefore(jcaMethod, fieldName);
-//
-//        // 创建代码块startTime
-//        String startTime = createStartTime(jcaMethod);
-//
-//        // 创建代码块logAfter
-//        createLogAfter(jcaMethod, fieldName, startTime);
+
+        // 创建代码块logBefore
+        createLogBefore(jcaMethod, fieldName);
+
+        // 创建代码块startTime
+        String startTime = createStartTime(jcaMethod);
+
+        // 创建代码块logAfter
+        createLogAfter(jcaMethod, fieldName, startTime);
     }
 
     /**
