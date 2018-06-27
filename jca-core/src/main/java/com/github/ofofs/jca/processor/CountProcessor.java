@@ -6,12 +6,14 @@ import com.github.ofofs.jca.constants.CoreConstants;
 import com.github.ofofs.jca.handler.impl.MemoryCountHandler;
 import com.github.ofofs.jca.model.*;
 import com.github.ofofs.jca.util.JcaExpressionUtil;
+import com.github.ofofs.jca.util.PropertiesUtil;
 import com.github.ofofs.jca.util.Sequence;
 import com.sun.tools.javac.code.Flags;
 
 import javax.annotation.processing.RoundEnvironment;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 调用次数限制注解处理器
@@ -114,6 +116,11 @@ public class CountProcessor extends AbstractJcaProcessor {
             return JcaCommon.method("this", key, jcaMethod.getArgs());
         }
 
+        String prefix = getPrefix();
+        if (!CoreConstants.EMPTY.equals(prefix)) {
+            value = prefix + ":" + value;
+        }
+
         return new JcaObject(JcaExpressionUtil.parse(value));
     }
 
@@ -136,6 +143,26 @@ public class CountProcessor extends AbstractJcaProcessor {
         // private static final MemoryCountHandler fieldName = value;
         JcaField jcaField = new JcaField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, handlerClass, fieldName, value);
         jcaClass.insert(jcaField);
+    }
+
+    /**
+     * 获取注解句柄的前缀
+     *
+     * @return 返回注解句柄的前缀
+     */
+    private String getPrefix() {
+        String prefix = PropertiesUtil.getProperty("count.prefix");
+        Set<JcaClass> handlers = getJcaClasses(Handler.class);
+        for (JcaClass handler : handlers) {
+            Handler anno = handler.getClazz().getAnnotation(Handler.class);
+            if (anno.value() == Handler.Type.COUNT) {
+                // 优先使用@Handler注解, 默认值为""
+                return anno.prefix();
+            }
+        }
+
+        // 没有@Handler的情况，以配置文件jca.properties为准， 缺省为""
+        return prefix;
     }
 
 }
