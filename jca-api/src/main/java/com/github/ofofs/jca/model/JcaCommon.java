@@ -204,4 +204,46 @@ public class JcaCommon {
         return new JcaObject(treeMaker.Literal(TypeTag.BOT, null));
     }
 
+    /**
+     * 不等于null
+     *
+     * @param varName 变量名
+     * @return 返回不等于null的表达式
+     */
+    public static JcaObject notNull(String varName) {
+        return new JcaObject(treeMaker.Binary(JCTree.Tag.NE, treeMaker.Ident(names.fromString(varName)), treeMaker.Literal(TypeTag.BOT, null)));
+    }
+
+    /**
+     * 获取if表达式
+     *
+     * @param condition 条件
+     * @param ifBlock   if代码块
+     * @return 返回if表达式
+     */
+    public static JcaObject getIf(JcaObject condition, JcaObject ifBlock) {
+        return getIf(condition, ifBlock, getNull());
+    }
+
+    /**
+     * 获取if表达式
+     *
+     * @param condition 条件
+     * @param ifBlock   if代码块
+     * @param elseBlock else代码块
+     * @return 返回if表达式
+     */
+    public static JcaObject getIf(JcaObject condition, JcaObject ifBlock, JcaObject elseBlock) {
+        return new JcaObject(treeMaker.If(condition.getObject(), ifBlock.getStatement(), elseBlock.getStatement()));
+    }
+
+    /**
+     * 获取return表达式
+     *
+     * @param express 表达式
+     * @return 返回return表达式
+     */
+    public static JcaObject getReturn(JcaObject express) {
+        return new JcaObject(treeMaker.Return(express.getObject()));
+    }
 }

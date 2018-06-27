@@ -77,6 +77,24 @@ public class JcaMethod extends JcaCommon {
     }
 
     /**
+     * 在方法第一行插入一个代码块
+     *
+     * @param express 表达式
+     * @return 返回当前方法
+     */
+    public JcaMethod insertBlock(JcaObject express) {
+        JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) trees.getTree(getMethod());
+        ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
+
+        statements.append(express.getStatement());
+        for (JCTree.JCStatement statement : methodDecl.body.stats) {
+            statements.append(statement);
+        }
+        methodDecl.body.stats = statements.toList();
+        return this;
+    }
+
+    /**
      * 获取方法名
      *
      * @return 返回方法名

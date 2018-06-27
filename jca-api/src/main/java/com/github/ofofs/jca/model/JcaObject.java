@@ -13,8 +13,17 @@ public class JcaObject {
      */
     private JCTree.JCExpression object;
 
+    /**
+     * 代码块
+     */
+    private JCTree.JCStatement statement;
+
     public JcaObject(JCTree.JCExpression object) {
         this.object = object;
+    }
+
+    public JcaObject(JCTree.JCStatement statement) {
+        this.statement = statement;
     }
 
     public JCTree.JCExpression getObject() {
@@ -23,5 +32,13 @@ public class JcaObject {
 
     public void setObject(JCTree.JCExpression object) {
         this.object = object;
+    }
+
+    public JCTree.JCStatement getStatement() {
+        return statement;
+    }
+
+    public void setStatement(JCTree.JCStatement statement) {
+        this.statement = statement;
     }
 }

@@ -56,6 +56,7 @@
         <!--Other-->
         <tools.version>1.5.0</tools.version>
         <fastjson.version>1.2.8</fastjson.version>
+        <jcel.version>1.0</jcel.version>
     </properties>
 
     <build>
@@ -140,8 +141,11 @@
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
-
-
+            <dependency>
+                <groupId>com.kangyonggan</groupId>
+                <artifactId>jcel</artifactId>
+                <version>${jcel.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

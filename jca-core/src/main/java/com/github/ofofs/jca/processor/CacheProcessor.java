@@ -2,9 +2,10 @@ package com.github.ofofs.jca.processor;
 
 import com.github.ofofs.jca.annotation.Cache;
 import com.github.ofofs.jca.annotation.Handler;
-import com.github.ofofs.jca.annotation.Log;
 import com.github.ofofs.jca.handler.impl.MemoryCacheHandler;
 import com.github.ofofs.jca.model.*;
+import com.github.ofofs.jca.util.JcaExpressionUtil;
+import com.github.ofofs.jca.util.PropertiesUtil;
 import com.github.ofofs.jca.util.Sequence;
 import com.sun.tools.javac.code.Flags;
 
@@ -60,15 +61,24 @@ public class CacheProcessor extends AbstractJcaProcessor {
      */
     private void createBefore(JcaMethod jcaMethod, String fieldName) {
         List<JcaObject> args = new ArrayList<>();
-        // TODO key
-        args.add(JcaCommon.getNull());
+        // key
+        String key = jcaMethod.getMethod().getAnnotation(Cache.class).value();
+        String prefix = PropertiesUtil.getProperty("cache.prefix");
+        if (!"".equals(prefix)) {
+            key = prefix + ":" + key;
+        }
+        args.add(new JcaObject(JcaExpressionUtil.parse(key)));
 
         // Object cacheValue = memoryCacheHandler.get(key)
         String varName = Sequence.nextString("var");
         JcaVariable jcaVariable = new JcaVariable(Object.class, varName, JcaCommon.method(fieldName, "get", args));
-        jcaMethod.insert(jcaVariable);
 
-        // TODO
+        // if (cacheValue != null) {return (returnType) cacheValue;}
+        JcaObject ifBlock = JcaCommon.getReturn(JcaCommon.classCast(jcaMethod.getReturnType(), JcaCommon.getVar(varName)));
+        JcaObject ifExpress = JcaCommon.getIf(JcaCommon.notNull(varName), ifBlock);
+
+        jcaMethod.insertBlock(ifExpress);
+        jcaMethod.insert(jcaVariable);
     }
 
     /**

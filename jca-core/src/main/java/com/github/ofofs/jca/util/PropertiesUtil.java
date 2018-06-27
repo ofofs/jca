@@ -44,4 +44,24 @@ public final class PropertiesUtil {
         return Boolean.parseBoolean(props.getProperty(type.name().toLowerCase() + ".enable", "true"));
     }
 
+    /**
+     * 根据键获取值
+     *
+     * @param key 键
+     * @return 返回对应的值
+     */
+    public static String getProperty(String key) {
+        return props.getProperty(key, "");
+    }
+
+    /**
+     * 根据键获取值
+     *
+     * @param key          键
+     * @param defaultValue 默认值
+     * @return 返回对应的值
+     */
+    public static String getProperty(String key, String defaultValue) {
+        return props.getProperty(key, defaultValue);
+    }
 }
