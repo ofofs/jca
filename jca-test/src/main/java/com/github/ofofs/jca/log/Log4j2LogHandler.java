@@ -7,7 +7,7 @@ import com.github.ofofs.jca.handler.LogHandler;
  * @author kangyonggan
  * @since 6/23/18
  */
-@Handler(type = Handler.Type.LOG)
+@Handler(Handler.Type.LOG)
 public class Log4j2LogHandler implements LogHandler {
 
     @Override

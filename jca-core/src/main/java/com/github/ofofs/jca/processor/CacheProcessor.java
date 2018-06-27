@@ -12,6 +12,7 @@ import com.sun.tools.javac.code.Flags;
 import javax.annotation.processing.RoundEnvironment;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 缓存注解处理器
@@ -63,7 +64,7 @@ public class CacheProcessor extends AbstractJcaProcessor {
         List<JcaObject> args = new ArrayList<>();
         // key
         String key = jcaMethod.getMethod().getAnnotation(Cache.class).value();
-        String prefix = PropertiesUtil.getProperty("cache.prefix");
+        String prefix = getPrefix();
         if (!"".equals(prefix)) {
             key = prefix + ":" + key;
         }
@@ -100,5 +101,25 @@ public class CacheProcessor extends AbstractJcaProcessor {
         // private static final MemoryCacheHandler fieldName = value;
         JcaField jcaField = new JcaField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, handlerClass, fieldName, value);
         jcaClass.insert(jcaField);
+    }
+
+    /**
+     * 获取注解句柄的前缀
+     *
+     * @return 返回注解句柄的前缀
+     */
+    private String getPrefix() {
+        String prefix = PropertiesUtil.getProperty("cache.prefix");
+        Set<JcaClass> handlers = getJcaClasses(Handler.class);
+        for (JcaClass handler : handlers) {
+            Handler anno = handler.getClazz().getAnnotation(Handler.class);
+            if (anno.value() == Handler.Type.CACHE) {
+                // 优先使用@Handler注解, 默认值为""
+                return anno.prefix();
+            }
+        }
+
+        // 没有@Handler的情况，以配置文件jca.properties为准， 缺省为""
+        return prefix;
     }
 }

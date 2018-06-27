@@ -21,11 +21,18 @@ public @interface Handler {
     boolean enable() default true;
 
     /**
+     * 缓存key的前缀，仅用于@Cache和@CacheDel
+     *
+     * @return 返回前缀
+     */
+    String prefix() default "";
+
+    /**
      * 类型
      *
      * @return 类型枚举
      */
-    Type type();
+    Type value();
 
     enum Type {
         /**
