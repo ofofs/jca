@@ -6,8 +6,6 @@
 
 package com.github.ofofs.jca.annotation;
 
-import com.github.ofofs.jca.annotation.Beta;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -26,6 +24,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 @Documented
-@Beta
+@API(status = API.Status.EXPERIMENTAL)
 public @interface Util {
 }

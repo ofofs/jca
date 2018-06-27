@@ -6,7 +6,7 @@
 
 package com.github.ofofs.jca.inner;
 
-import com.github.ofofs.jca.annotation.Alpha;
+import com.github.ofofs.jca.annotation.API;
 import com.sun.tools.javac.tree.JCTree;
 
 /**
@@ -25,7 +25,7 @@ import com.sun.tools.javac.tree.JCTree;
  * @since JDK 1.7
  * @see com.sun.source.tree.ClassTree class 树信息
  */
-@Alpha
+@API(status = API.Status.INTERNAL)
 public interface IJcaCommon {
 
     /**

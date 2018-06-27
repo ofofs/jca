@@ -1,6 +1,6 @@
 package com.github.ofofs.jca.constants;
 
-import com.github.ofofs.jca.annotation.Beta;
+import com.github.ofofs.jca.annotation.API;
 
 /**
  * 常量
@@ -18,6 +18,6 @@ public interface JcaConstants {
     /**
      * 构造器名称
      */
-    @Beta
+    @API(status = API.Status.EXPERIMENTAL)
     String CONSTRUCTOR_NAME = "<init>";
 }

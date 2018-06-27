@@ -6,7 +6,7 @@
 
 package com.github.ofofs.jca.processor;
 
-import com.github.ofofs.jca.annotation.Beta;
+import com.github.ofofs.jca.annotation.API;
 import com.github.ofofs.jca.annotation.Handler;
 import com.github.ofofs.jca.annotation.Util;
 import com.github.ofofs.jca.model.JcaClass;
@@ -25,7 +25,7 @@ import javax.annotation.processing.RoundEnvironment;
  * @see com.github.ofofs.jca.annotation.Util 工具类注解
  * @since JDK 1.7
  */
-@Beta
+@API(status = API.Status.EXPERIMENTAL)
 public class UtilProcessor extends AbstractJcaProcessor {
 
     protected UtilProcessor(RoundEnvironment env) {

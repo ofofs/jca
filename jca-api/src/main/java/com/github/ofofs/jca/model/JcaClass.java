@@ -1,6 +1,6 @@
 package com.github.ofofs.jca.model;
 
-import com.github.ofofs.jca.annotation.Alpha;
+import com.github.ofofs.jca.annotation.API;
 import com.github.ofofs.jca.constants.JcaConstants;
 import com.github.ofofs.jca.util.Sequence;
 import com.sun.source.tree.Tree;
@@ -11,8 +11,9 @@ import com.sun.tools.javac.tree.TreeTranslator;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
 
-import javax.lang.model.element.Modifier;
 import java.util.Set;
+
+import javax.lang.model.element.Modifier;
 
 /**
  * @author kangyonggan
@@ -201,7 +202,7 @@ public class JcaClass extends JcaCommon {
      * @param modifier 访问修饰符
      * @return {@code true} 是
      */
-    @Alpha
+    @API(status = API.Status.EXPERIMENTAL)
     private static boolean isDefaultConstructor(JCTree jcTree, Modifier modifier) {
 
         if (jcTree.getKind() == Tree.Kind.METHOD) {
@@ -220,7 +221,7 @@ public class JcaClass extends JcaCommon {
      * @param jcMethodDecl 方法声明
      * @return {@code true} 是
      */
-    @Alpha
+    @API(status = API.Status.INTERNAL)
     private static boolean isConstructor(JCTree.JCMethodDecl jcMethodDecl) {
         String name = jcMethodDecl.name.toString();
         return JcaConstants.CONSTRUCTOR_NAME.equals(name);
@@ -232,7 +233,7 @@ public class JcaClass extends JcaCommon {
      * @param jcMethodDecl 方法声明
      * @return {@code true} 是
      */
-    @Alpha
+    @API(status = API.Status.INTERNAL)
     private static boolean isNoArgsMethod(JCTree.JCMethodDecl jcMethodDecl) {
         List<JCTree.JCVariableDecl> jcVariableDeclList = jcMethodDecl.getParameters();
         return jcVariableDeclList == null
@@ -246,7 +247,7 @@ public class JcaClass extends JcaCommon {
      * @param modifier     修饰符
      * @return {@code true} 是
      */
-    @Alpha
+    @API(status = API.Status.INTERNAL)
     private static boolean isMatchModifierMethod(JCTree.JCMethodDecl jcMethodDecl,
                                                  Modifier modifier) {
         JCTree.JCModifiers jcModifiers = jcMethodDecl.getModifiers();
