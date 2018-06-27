@@ -141,6 +141,15 @@ public class JcaMethod extends JcaCommon {
     }
 
     /**
+     * 判断方法是否有返回值
+     *
+     * @return 有则返回true，否则返回false
+     */
+    public boolean hasReturnValue() {
+        return !JcaConstants.RETURN_VOID.equals(getReturnType().getObject().toString());
+    }
+
+    /**
      * 方法返回的回调
      *
      * @param returnValue 返回值

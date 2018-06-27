@@ -32,6 +32,8 @@ public class JcaProcessor extends AbstractProcessor {
         new CacheProcessor(env).process();
         // 日志(日志注解需要在缓存注解后面处理)
         new LogProcessor(env).process();
+        // 调用次数限制(调用次数限制注解需要在日志注解后面处理)
+        new CountProcessor(env).process();
         // 工具类处理
         new UtilProcessor(env).process();
         return true;

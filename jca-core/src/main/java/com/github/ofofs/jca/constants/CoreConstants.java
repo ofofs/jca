@@ -11,4 +11,9 @@ public interface CoreConstants {
      */
     String PROPERTIES_NAME = "jca.properties";
 
+    /**
+     * 空字符串
+     */
+    String EMPTY = "";
+
 }

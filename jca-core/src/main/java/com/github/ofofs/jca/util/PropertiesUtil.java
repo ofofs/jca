@@ -51,7 +51,7 @@ public final class PropertiesUtil {
      * @return 返回对应的值
      */
     public static String getProperty(String key) {
-        return props.getProperty(key, "");
+        return props.getProperty(key, CoreConstants.EMPTY);
     }
 
     /**

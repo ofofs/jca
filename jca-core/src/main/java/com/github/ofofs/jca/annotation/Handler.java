@@ -57,7 +57,11 @@ public @interface Handler {
         /**
          * 工具类
          */
-        UTIL
+        UTIL,
+        /**
+         * 限制调用次数
+         */
+        COUNT
     }
 
 }

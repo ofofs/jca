@@ -246,4 +246,34 @@ public class JcaCommon {
     public static JcaObject getReturn(JcaObject express) {
         return new JcaObject(treeMaker.Return(express.getObject()));
     }
+
+    /**
+     * 获取return;
+     *
+     * @return 返回return;
+     */
+    public static JcaObject getReturn() {
+        return new JcaObject(treeMaker.Return(null));
+    }
+
+    /**
+     * 拼接代码块
+     *
+     * @param blocks 代码块
+     * @return 返回拼接之后的代码块
+     */
+    public static JcaObject block(JcaObject... blocks) {
+        List<JCTree.JCStatement> statements = List.nil();
+
+        for (JcaObject block : blocks) {
+            if (block.getObject() != null) {
+                statements = statements.append(treeMaker.Exec(block.getObject()));
+            } else if (block.getStatement() != null) {
+                statements = statements.append(block.getStatement());
+            }
+        }
+
+        JCTree.JCBlock block = treeMaker.Block(statements.size(), statements);
+        return new JcaObject(block);
+    }
 }
