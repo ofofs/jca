@@ -1,7 +1,9 @@
 package com.github.ofofs.jca.processor;
 
 import com.github.ofofs.jca.annotation.Cache;
+import com.github.ofofs.jca.annotation.CacheDel;
 import com.github.ofofs.jca.annotation.Handler;
+import com.github.ofofs.jca.constants.JcaConstants;
 import com.github.ofofs.jca.handler.impl.MemoryCacheHandler;
 import com.github.ofofs.jca.model.*;
 import com.github.ofofs.jca.util.JcaExpressionUtil;
@@ -34,9 +36,41 @@ public class CacheProcessor extends AbstractJcaProcessor {
         if (isEnable(Handler.Type.CACHE)) {
             String fieldName = Sequence.nextString("field");
             for (JcaMethod jcaMethod : getJcaMethods(Cache.class)) {
+                if (JcaConstants.RETURN_VOID.equals(jcaMethod.getReturnType().getObject().toString())) {
+                    continue;
+                }
                 process(jcaMethod, fieldName);
             }
+            // 生成的代码是插入到第一行的，因此是先删除缓存，如果有@Cache再保存缓存
+            for (JcaMethod jcaMethod : getJcaMethods(CacheDel.class)) {
+                processDel(jcaMethod, fieldName);
+            }
         }
+    }
+
+    /**
+     * 处理每一个方法（删除缓存）
+     * memoryCacheHandler.delete(key);
+     *
+     * @param jcaMethod 方法
+     * @param fieldName 字段名
+     */
+    private void processDel(JcaMethod jcaMethod, String fieldName) {
+        // 给方法所在的类创建一个字段
+        createField(jcaMethod.getJcaClass(), fieldName);
+
+        // key
+        String key = jcaMethod.getMethod().getAnnotation(CacheDel.class).value();
+        String prefix = getPrefix();
+        if (!"".equals(prefix)) {
+            key = prefix + ":" + key;
+        }
+
+        List<JcaObject> args = new ArrayList<>();
+        args.add(new JcaObject(JcaExpressionUtil.parse(key)));
+
+        // memoryCacheHandler.delete(key)
+        jcaMethod.insert(JcaCommon.method(fieldName, "delete", args));
     }
 
     /**

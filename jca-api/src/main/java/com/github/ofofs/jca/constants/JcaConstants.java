@@ -20,4 +20,9 @@ public interface JcaConstants {
      */
     @API(status = API.Status.EXPERIMENTAL)
     String CONSTRUCTOR_NAME = "<init>";
+
+    /**
+     * null
+     */
+    String NULL = "null";
 }

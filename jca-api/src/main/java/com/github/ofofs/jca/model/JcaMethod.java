@@ -175,7 +175,9 @@ public class JcaMethod extends JcaCommon {
                 if (returnType.getObject() == null || JcaConstants.RETURN_VOID.equals(returnType.getObject().toString())) {
                     if (!(stat instanceof JCTree.JCReturn)) {
                         JcaObject jcaObject = onReturn(getNull());
-                        statements.append(treeMaker.Exec(jcaObject.getObject()));
+                        if (jcaObject != null && !JcaConstants.NULL.equals(jcaObject.getObject().toString())) {
+                            statements.append(treeMaker.Exec(jcaObject.getObject()));
+                        }
                     }
                 }
             }
