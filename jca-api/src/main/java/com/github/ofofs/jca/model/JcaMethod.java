@@ -1,6 +1,7 @@
 package com.github.ofofs.jca.model;
 
 import com.github.ofofs.jca.constants.JcaConstants;
+import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.ListBuffer;
@@ -335,6 +336,15 @@ public class JcaMethod extends JcaCommon {
      * @return 如果方法是静态的返回true，否则返回false
      */
     public boolean isStatic() {
-        return methodDecl.getModifiers().getFlags().contains(Modifier.STATIC);
+        return hasModifier(Flags.STATIC);
+    }
+
+    /**
+     * 判断方法是不是有某个修饰符
+     *
+     * @return 如果方法有某个修饰符的返回true，否则返回false
+     */
+    public boolean hasModifier(int modifier) {
+        return methodDecl.mods.flags % (modifier * 2) >= modifier;
     }
 }
