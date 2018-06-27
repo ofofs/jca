@@ -44,11 +44,29 @@ public class CountTest {
         System.out.println("xx");
     }
 
-    public String getUsernameViolate(String name) {
+    /**
+     * 10秒内同一个ip最多调用5次，否则触发回调方法
+     *
+     * @param name name
+     */
+    @Count(key = "getKey2", during = 10000, count = 5, violate = "getUsernameViolate")
+    public static void getUsername4(String name) {
+        if ("".equals(name)) {
+            System.out.println(name);
+            return;
+        }
+        System.out.println("xx");
+    }
+
+    public static String getUsernameViolate(String name) {
         return "error";
     }
 
     public String getKey(String name) {
+        return "ip";
+    }
+
+    public static String getKey2(String name) {
         return "ip";
     }
 }

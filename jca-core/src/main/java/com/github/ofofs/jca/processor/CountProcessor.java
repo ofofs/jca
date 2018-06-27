@@ -69,16 +69,24 @@ public class CountProcessor extends AbstractJcaProcessor {
 
         if (jcaMethod.hasReturnValue()) {
             // if (isViolate) {return (returnType) this.violate(args);}
-            // TODO 后面再兼容静态方法
-            JcaObject ifBlock = JcaCommon.getReturn(JcaCommon.classCast(jcaMethod.getReturnType(), JcaCommon.method("this", count.violate(), jcaMethod.getArgs())));
+            JcaObject ifBlock;
+            if (jcaMethod.isStatic()) {
+                ifBlock = JcaCommon.getReturn(JcaCommon.classCast(jcaMethod.getReturnType(), JcaCommon.method(jcaMethod.getJcaClass().getClassName(), count.violate(), jcaMethod.getArgs())));
+            } else {
+                ifBlock = JcaCommon.getReturn(JcaCommon.classCast(jcaMethod.getReturnType(), JcaCommon.method("this", count.violate(), jcaMethod.getArgs())));
+            }
             JcaObject ifExpress = JcaCommon.getIf(isViolate, ifBlock);
 
             jcaMethod.insertBlock(ifExpress);
         } else {
             // 没返回值的情况
             // if (isViolate) {this.violate(args);return;}
-            // TODO 后面再兼容静态方法
-            JcaObject ifBlock = JcaCommon.method("this", count.violate(), jcaMethod.getArgs());
+            JcaObject ifBlock;
+            if (jcaMethod.isStatic()) {
+                ifBlock = JcaCommon.method(jcaMethod.getJcaClass().getClassName(), count.violate(), jcaMethod.getArgs());
+            } else {
+                ifBlock = JcaCommon.method("this", count.violate(), jcaMethod.getArgs());
+            }
             ifBlock = JcaCommon.block(ifBlock, JcaCommon.getReturn());
             JcaObject ifExpress = JcaCommon.getIf(isViolate, ifBlock);
             jcaMethod.insertBlock(ifExpress);
@@ -100,7 +108,9 @@ public class CountProcessor extends AbstractJcaProcessor {
                 throw new RuntimeException("@Count注解的key和value不能同时为空！");
             }
 
-            // TODO 静态方法不能调用this，需要再增强,先死后活，这是第一版
+            if (jcaMethod.isStatic()) {
+                return JcaCommon.method(jcaMethod.getJcaClass().getClassName(), key, jcaMethod.getArgs());
+            }
             return JcaCommon.method("this", key, jcaMethod.getArgs());
         }
 

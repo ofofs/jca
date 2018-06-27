@@ -5,6 +5,7 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.ListBuffer;
 
+import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,11 @@ public class JcaMethod extends JcaCommon {
     private Symbol.MethodSymbol method;
 
     /**
+     * 方法的定义
+     */
+    private JCTree.JCMethodDecl methodDecl;
+
+    /**
      * 方法所属的类
      */
     private JcaClass jcaClass;
@@ -29,6 +35,7 @@ public class JcaMethod extends JcaCommon {
     public JcaMethod(Symbol.MethodSymbol method) {
         this.method = method;
         jcaClass = new JcaClass((Symbol.ClassSymbol) method.owner);
+        methodDecl = (JCTree.JCMethodDecl) trees.getTree(method);
     }
 
     public JcaClass getJcaClass() {
@@ -109,7 +116,6 @@ public class JcaMethod extends JcaCommon {
      * @param modifier 修饰符
      */
     public void setModifier(int modifier) {
-        JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) trees.getTree(method);
         methodDecl.mods = treeMaker.Modifiers(modifier);
     }
 
@@ -137,7 +143,7 @@ public class JcaMethod extends JcaCommon {
      * @return 返回方法的返回类型
      */
     public JcaObject getReturnType() {
-        return new JcaObject(((JCTree.JCMethodDecl) trees.getTree(method)).restype);
+        return new JcaObject(methodDecl.restype);
     }
 
     /**
@@ -165,7 +171,6 @@ public class JcaMethod extends JcaCommon {
      * @return 返回放弃方法
      */
     public JcaMethod visitReturn() {
-        JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) trees.getTree(method);
         ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
         com.sun.tools.javac.util.List<JCTree.JCStatement> stats = methodDecl.body.stats;
         if (stats.isEmpty()) {
@@ -322,5 +327,14 @@ public class JcaMethod extends JcaCommon {
         int result = method != null ? method.hashCode() : 0;
         result = 31 * result + (jcaClass != null ? jcaClass.hashCode() : 0);
         return result;
+    }
+
+    /**
+     * 判断方法是不是静态的
+     *
+     * @return 如果方法是静态的返回true，否则返回false
+     */
+    public boolean isStatic() {
+        return methodDecl.getModifiers().getFlags().contains(Modifier.STATIC);
     }
 }
