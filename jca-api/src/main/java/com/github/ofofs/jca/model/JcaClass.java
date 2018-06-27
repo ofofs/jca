@@ -1,19 +1,13 @@
 package com.github.ofofs.jca.model;
 
-import com.github.ofofs.jca.annotation.API;
 import com.github.ofofs.jca.constants.JcaConstants;
 import com.github.ofofs.jca.util.Sequence;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.TreeTranslator;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
-
-import java.util.Set;
-
-import javax.lang.model.element.Modifier;
 
 /**
  * @author kangyonggan
@@ -149,110 +143,18 @@ public class JcaClass extends JcaCommon {
      * 设置无参数私有构造器
      */
     public void setNoArgPrivateConstructor() {
-        JCTree tree = (JCTree) trees.getTree(clazz);
-        tree.accept(new TreeTranslator() {
-            @Override
-            public void visitClassDef(JCTree.JCClassDecl jcClassDecl) {
-                List<JCTree> oldList = this.translate(jcClassDecl.defs);
-                ListBuffer<JCTree> statements = new ListBuffer<>();
-
-                boolean hasPrivateDefaultConstructor = false;
-                for (JCTree jcTree : oldList) {
-                    if (isDefaultConstructor(jcTree, Modifier.PUBLIC)) {
-                        //1. 设置访问符号为私有
-                        JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) jcTree;
-                        JcaMethod jcaMethod = new JcaMethod(methodDecl.sym);
-                        jcaMethod.setModifier(Flags.PRIVATE);
-
-                        hasPrivateDefaultConstructor = true;
-                    }
-                    if (isDefaultConstructor(jcTree, Modifier.PRIVATE)) {
-                        hasPrivateDefaultConstructor = true;
-                    }
-                    statements.append(jcTree);
+        // 遍历类的所有字段和方法
+        for (JCTree jcTree : classDecl.defs) {
+            // 只处理方法
+            if (jcTree instanceof JCTree.JCMethodDecl) {
+                JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) jcTree;
+                // 如果是构造方法 并且 没有参数
+                if (JcaConstants.CONSTRUCTOR_NAME.equals(methodDecl.name.toString()) && methodDecl.params.isEmpty()) {
+                    // 把修饰符改为private
+                    methodDecl.mods = treeMaker.Modifiers(Flags.PRIVATE);
                 }
-
-                if (!hasPrivateDefaultConstructor) {
-                    // 添加私有构造器
-                    JCTree.JCBlock block = treeMaker.Block(0L, List.nil());
-                    JCTree.JCMethodDecl constructor = treeMaker.MethodDef(
-                            treeMaker.Modifiers(Flags.PRIVATE, List.nil()),
-                            names.fromString(JcaConstants.CONSTRUCTOR_NAME),
-                            null,
-                            List.nil(),
-                            List.nil(),
-                            List.nil(),
-                            block,
-                            null);
-
-                    statements.append(constructor);
-                    //更新
-                    jcClassDecl.defs = statements.toList();
-                }
-                this.result = jcClassDecl;
             }
-        });
-    }
-
-
-    /**
-     * 是否为共有默认构造器
-     *
-     * @param jcTree   tree 信息
-     * @param modifier 访问修饰符
-     * @return {@code true} 是
-     */
-    @API(status = API.Status.EXPERIMENTAL)
-    private static boolean isDefaultConstructor(JCTree jcTree, Modifier modifier) {
-
-        if (jcTree.getKind() == Tree.Kind.METHOD) {
-            JCTree.JCMethodDecl jcMethodDecl = (JCTree.JCMethodDecl) jcTree;
-            return isConstructor(jcMethodDecl)
-                    && isNoArgsMethod(jcMethodDecl)
-                    && isMatchModifierMethod(jcMethodDecl, modifier);
         }
-
-        return false;
-    }
-
-    /**
-     * 是否为构造器
-     *
-     * @param jcMethodDecl 方法声明
-     * @return {@code true} 是
-     */
-    @API(status = API.Status.INTERNAL)
-    private static boolean isConstructor(JCTree.JCMethodDecl jcMethodDecl) {
-        String name = jcMethodDecl.name.toString();
-        return JcaConstants.CONSTRUCTOR_NAME.equals(name);
-    }
-
-    /**
-     * 是否为无参方法
-     *
-     * @param jcMethodDecl 方法声明
-     * @return {@code true} 是
-     */
-    @API(status = API.Status.INTERNAL)
-    private static boolean isNoArgsMethod(JCTree.JCMethodDecl jcMethodDecl) {
-        List<JCTree.JCVariableDecl> jcVariableDeclList = jcMethodDecl.getParameters();
-        return jcVariableDeclList == null
-                || jcVariableDeclList.size() == 0;
-    }
-
-    /**
-     * 是否为匹配修饰符的方法
-     *
-     * @param jcMethodDecl 方法声明
-     * @param modifier     修饰符
-     * @return {@code true} 是
-     */
-    @API(status = API.Status.INTERNAL)
-    private static boolean isMatchModifierMethod(JCTree.JCMethodDecl jcMethodDecl,
-                                                 Modifier modifier) {
-        JCTree.JCModifiers jcModifiers = jcMethodDecl.getModifiers();
-        Set<Modifier> modifiers = jcModifiers.getFlags();
-        return modifiers.contains(modifier);
     }
 
     @Override
