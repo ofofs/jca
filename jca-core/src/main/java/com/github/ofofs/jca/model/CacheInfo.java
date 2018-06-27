@@ -33,6 +33,8 @@ public class CacheInfo implements Serializable {
     }
 
     public Object getValue() {
+        // 每次取值时更新最后更新时间
+        this.updateDate = new Date();
         return value;
     }
 

@@ -49,25 +49,57 @@ public class CacheProcessor extends AbstractJcaProcessor {
         // 给方法所在的类创建一个字段
         createField(jcaMethod.getJcaClass(), fieldName);
 
-        // 在方法第一行创建代码块
-        createBefore(jcaMethod, fieldName);
-    }
-
-    /**
-     * Object cacheValue = memoryCacheHandler.get(key);
-     * if (cacheValue != null) {return (returnType) cacheValue;}
-     *
-     * @param jcaMethod 方法
-     * @param fieldName 字段名
-     */
-    private void createBefore(JcaMethod jcaMethod, String fieldName) {
-        List<JcaObject> args = new ArrayList<>();
         // key
         String key = jcaMethod.getMethod().getAnnotation(Cache.class).value();
         String prefix = getPrefix();
         if (!"".equals(prefix)) {
             key = prefix + ":" + key;
         }
+
+        // 在方法第一行创建代码块
+        createBefore(jcaMethod, fieldName, key);
+
+        // 在return前创建代码块
+        createAfter(jcaMethod, fieldName, key);
+    }
+
+    /**
+     * return (ReturnType) memoryCacheHandler.set(key, returnValue, expire)
+     *
+     * @param jcaMethod 方法
+     * @param fieldName 字段名
+     * @param key       缓存的键
+     */
+    private void createAfter(JcaMethod jcaMethod, String fieldName, String key) {
+        new JcaMethod(jcaMethod.getMethod()) {
+            @Override
+            public JcaObject onReturn(JcaObject returnValue) {
+                List<JcaObject> args = new ArrayList<>();
+                // key
+                args.add(new JcaObject(JcaExpressionUtil.parse(key)));
+                // returnValue
+                args.add(new JcaObject(returnValue.getObject()));
+                // expire
+                args.add(JcaCommon.getValue(getExpire(jcaMethod)));
+
+                JcaObject express = JcaCommon.method(fieldName, "set", args);
+                // 替换原来的返回值
+                returnValue.setObject(JcaCommon.classCast(jcaMethod.getReturnType(), express).getObject());
+                return returnValue;
+            }
+        }.visitReturn();
+    }
+
+    /**
+     * Object cacheValue = memoryCacheHandler.get(key);
+     * if (cacheValue != null) {return (ReturnType) cacheValue;}
+     *
+     * @param jcaMethod 方法
+     * @param fieldName 字段名
+     * @param key       缓存的键
+     */
+    private void createBefore(JcaMethod jcaMethod, String fieldName, String key) {
+        List<JcaObject> args = new ArrayList<>();
         args.add(new JcaObject(JcaExpressionUtil.parse(key)));
 
         // Object cacheValue = memoryCacheHandler.get(key)
@@ -121,5 +153,35 @@ public class CacheProcessor extends AbstractJcaProcessor {
 
         // 没有@Handler的情况，以配置文件jca.properties为准， 缺省为""
         return prefix;
+    }
+
+    /**
+     * 获取缓存的失效时间
+     *
+     * @param jcaMethod 所在的方法
+     * @return 返回缓存的失效时间
+     */
+    public long getExpire(JcaMethod jcaMethod) {
+        // 优先使用@Cache的失效时间
+        long expire = jcaMethod.getMethod().getAnnotation(Cache.class).expire();
+        if (expire != -1) {
+            return expire;
+        }
+
+        // 次优先使用@Handler的失效时间
+        Set<JcaClass> handlers = getJcaClasses(Handler.class);
+        for (JcaClass handler : handlers) {
+            Handler anno = handler.getClazz().getAnnotation(Handler.class);
+            if (anno.value() == Handler.Type.CACHE) {
+                expire = anno.expire();
+                if (expire != -1) {
+                    return expire;
+                }
+            }
+        }
+
+        // 最后使用jca.properties的失效时间(默认30分钟)
+        expire = Long.parseLong(PropertiesUtil.getProperty("cache.expire", "1800000"));
+        return expire;
     }
 }

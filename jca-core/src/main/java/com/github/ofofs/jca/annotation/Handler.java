@@ -28,6 +28,13 @@ public @interface Handler {
     String prefix() default "";
 
     /**
+     * 缓存失效时间, 单位毫秒
+     *
+     * @return 返回缓存失效时间，默认30分钟
+     */
+    long expire() default -1;
+
+    /**
      * 类型
      *
      * @return 类型枚举

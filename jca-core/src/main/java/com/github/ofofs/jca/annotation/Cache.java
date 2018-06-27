@@ -20,4 +20,11 @@ public @interface Cache {
      * @return 返回缓存的键
      */
     String value();
+
+    /**
+     * 缓存失效时间, 单位毫秒
+     *
+     * @return 返回缓存失效时间，默认30分钟
+     */
+    long expire() default -1;
 }
