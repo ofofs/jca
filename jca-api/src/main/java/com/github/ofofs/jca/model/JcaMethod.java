@@ -6,7 +6,6 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.ListBuffer;
 
-import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,15 +84,15 @@ public class JcaMethod extends JcaCommon {
     /**
      * 在方法第一行插入一个代码块
      *
-     * @param express 表达式
+     * @param statement 代码块
      * @return 返回当前方法
      */
-    public JcaMethod insertBlock(JcaObject express) {
+    public JcaMethod insertBlock(JcaObject statement) {
         ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
 
-        statements.append(express.getStatement());
-        for (JCTree.JCStatement statement : methodDecl.body.stats) {
-            statements.append(statement);
+        statements.append(statement.getStatement());
+        for (JCTree.JCStatement stat : methodDecl.body.stats) {
+            statements.append(stat);
         }
         methodDecl.body.stats = statements.toList();
         return this;
