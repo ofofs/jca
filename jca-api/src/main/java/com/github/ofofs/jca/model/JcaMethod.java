@@ -56,7 +56,7 @@ public class JcaMethod extends JcaCommon {
         ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
 
         importPackage(getJcaClass(), jcaVariable.getTypeClass());
-        statements.append(treeMaker.VarDef(treeMaker.Modifiers(0), names.fromString(jcaVariable.getVarName()), getType(jcaVariable.getTypeClass()), jcaVariable.getValue().getObject()));
+        statements.append(treeMaker.VarDef(treeMaker.Modifiers(0), names.fromString(jcaVariable.getVarName()), getType(jcaVariable.getTypeClass()), jcaVariable.getValue().getExpression()));
         for (JCTree.JCStatement statement : methodDecl.body.stats) {
             statements.append(statement);
         }
@@ -73,7 +73,7 @@ public class JcaMethod extends JcaCommon {
     public JcaMethod insert(JcaObject express) {
         ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
 
-        statements.append(treeMaker.Exec(express.getObject()));
+        statements.append(treeMaker.Exec(express.getExpression()));
         for (JCTree.JCStatement statement : methodDecl.body.stats) {
             statements.append(statement);
         }
@@ -151,7 +151,7 @@ public class JcaMethod extends JcaCommon {
      * @return 有则返回true，否则返回false
      */
     public boolean hasReturnValue() {
-        return !JcaConstants.RETURN_VOID.equals(getReturnType().getObject().toString());
+        return !JcaConstants.RETURN_VOID.equals(getReturnType().getExpression().toString());
     }
 
     /**
@@ -174,7 +174,7 @@ public class JcaMethod extends JcaCommon {
         com.sun.tools.javac.util.List<JCTree.JCStatement> stats = methodDecl.body.stats;
         if (stats.isEmpty()) {
             JcaObject jcaObject = onReturn(getNull());
-            statements.append(treeMaker.Exec(jcaObject.getObject()));
+            statements.append(treeMaker.Exec(jcaObject.getExpression()));
         }
         JcaObject returnType = getReturnType();
         for (int i = 0; i < stats.size(); i++) {
@@ -185,11 +185,11 @@ public class JcaMethod extends JcaCommon {
             }
 
             if (i == stats.size() - 1) {
-                if (returnType.getObject() == null || JcaConstants.RETURN_VOID.equals(returnType.getObject().toString())) {
+                if (returnType.getExpression() == null || JcaConstants.RETURN_VOID.equals(returnType.getExpression().toString())) {
                     if (!(stat instanceof JCTree.JCReturn)) {
                         JcaObject jcaObject = onReturn(getNull());
-                        if (jcaObject != null && !JcaConstants.NULL.equals(jcaObject.getObject().toString())) {
-                            statements.append(treeMaker.Exec(jcaObject.getObject()));
+                        if (jcaObject != null && !JcaConstants.NULL.equals(jcaObject.getExpression().toString())) {
+                            statements.append(treeMaker.Exec(jcaObject.getExpression()));
                         }
                     }
                 }
@@ -213,12 +213,12 @@ public class JcaMethod extends JcaCommon {
             if (jcReturn.expr == null) {
                 // return;
                 JcaObject jcaObject = onReturn(getNull());
-                statements.append(treeMaker.Exec(jcaObject.getObject()));
+                statements.append(treeMaker.Exec(jcaObject.getExpression()));
                 statements.append(stat);
             } else {
                 // return xxx;
                 JcaObject jcaObject = onReturn(new JcaObject(jcReturn.expr));
-                jcReturn.expr = jcaObject.getObject();
+                jcReturn.expr = jcaObject.getExpression();
                 statements.append(jcReturn);
             }
         } else if (stat instanceof JCTree.JCIf) {

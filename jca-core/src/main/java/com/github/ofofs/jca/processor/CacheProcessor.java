@@ -36,7 +36,7 @@ public class CacheProcessor extends AbstractJcaProcessor {
         if (isEnable(Handler.Type.CACHE)) {
             String fieldName = Sequence.nextString("field");
             for (JcaMethod jcaMethod : getJcaMethods(Cache.class)) {
-                if (JcaConstants.RETURN_VOID.equals(jcaMethod.getReturnType().getObject().toString())) {
+                if (JcaConstants.RETURN_VOID.equals(jcaMethod.getReturnType().getExpression().toString())) {
                     continue;
                 }
                 process(jcaMethod, fieldName);
@@ -112,13 +112,13 @@ public class CacheProcessor extends AbstractJcaProcessor {
                 // key
                 args.add(new JcaObject(JcaExpressionUtil.parse(key)));
                 // returnValue
-                args.add(new JcaObject(returnValue.getObject()));
+                args.add(new JcaObject(returnValue.getExpression()));
                 // expire
                 args.add(JcaCommon.getValue(getExpire(jcaMethod)));
 
                 JcaObject express = JcaCommon.method(fieldName, "set", args);
                 // 替换原来的返回值
-                returnValue.setObject(JcaCommon.classCast(jcaMethod.getReturnType(), express).getObject());
+                returnValue.setExpression(JcaCommon.classCast(jcaMethod.getReturnType(), express).getExpression());
                 return returnValue;
             }
         }.visitReturn();

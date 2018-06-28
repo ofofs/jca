@@ -9,29 +9,29 @@ import com.sun.tools.javac.tree.JCTree;
 public class JcaObject {
 
     /**
-     * 对象
+     * 表达式
      */
-    private JCTree.JCExpression object;
+    private JCTree.JCExpression expression;
 
     /**
      * 代码块
      */
     private JCTree.JCStatement statement;
 
-    public JcaObject(JCTree.JCExpression object) {
-        this.object = object;
+    public JcaObject(JCTree.JCExpression expression) {
+        this.expression = expression;
     }
 
     public JcaObject(JCTree.JCStatement statement) {
         this.statement = statement;
     }
 
-    public JCTree.JCExpression getObject() {
-        return object;
+    public JCTree.JCExpression getExpression() {
+        return expression;
     }
 
-    public void setObject(JCTree.JCExpression object) {
-        this.object = object;
+    public void setExpression(JCTree.JCExpression expression) {
+        this.expression = expression;
     }
 
     public JCTree.JCStatement getStatement() {

@@ -114,7 +114,7 @@ public class JcaCommon {
         List argsList = List.nil();
         if (args != null) {
             for (JcaObject jcaObject : args) {
-                argsList = argsList.append(jcaObject.getObject());
+                argsList = argsList.append(jcaObject.getExpression());
             }
         }
         JCTree.JCMethodInvocation methodInvocation = treeMaker.Apply(List.nil(), fieldAccess, argsList);
@@ -129,10 +129,10 @@ public class JcaCommon {
      * @return 返回转换后的对象
      */
     public static JcaObject classCast(JcaObject type, JcaObject value) {
-        if (JcaConstants.RETURN_VOID.equals(type.getObject().toString())) {
+        if (JcaConstants.RETURN_VOID.equals(type.getExpression().toString())) {
             return value;
         }
-        return new JcaObject(treeMaker.TypeCast(type.getObject(), value.getObject()));
+        return new JcaObject(treeMaker.TypeCast(type.getExpression(), value.getExpression()));
     }
 
     /**
@@ -234,7 +234,7 @@ public class JcaCommon {
      * @return 返回if表达式
      */
     public static JcaObject getIf(JcaObject condition, JcaObject ifBlock, JcaObject elseBlock) {
-        return new JcaObject(treeMaker.If(condition.getObject(), ifBlock.getStatement(), elseBlock.getStatement()));
+        return new JcaObject(treeMaker.If(condition.getExpression(), ifBlock.getStatement(), elseBlock.getStatement()));
     }
 
     /**
@@ -244,7 +244,7 @@ public class JcaCommon {
      * @return 返回return表达式
      */
     public static JcaObject getReturn(JcaObject express) {
-        return new JcaObject(treeMaker.Return(express.getObject()));
+        return new JcaObject(treeMaker.Return(express.getExpression()));
     }
 
     /**
@@ -266,8 +266,8 @@ public class JcaCommon {
         List<JCTree.JCStatement> statements = List.nil();
 
         for (JcaObject block : blocks) {
-            if (block.getObject() != null) {
-                statements = statements.append(treeMaker.Exec(block.getObject()));
+            if (block.getExpression() != null) {
+                statements = statements.append(treeMaker.Exec(block.getExpression()));
             } else if (block.getStatement() != null) {
                 statements = statements.append(block.getStatement());
             }

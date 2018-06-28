@@ -77,11 +77,11 @@ public class LogProcessor extends AbstractJcaProcessor {
                 // startTime
                 args.add(JcaCommon.getVar(startTime));
                 // returnValue
-                args.add(new JcaObject(returnValue.getObject()));
+                args.add(new JcaObject(returnValue.getExpression()));
 
                 JcaObject express = JcaCommon.method(fieldName, "logAfter", args);
                 // 替换原来的返回值
-                returnValue.setObject(JcaCommon.classCast(jcaMethod.getReturnType(), express).getObject());
+                returnValue.setExpression(JcaCommon.classCast(jcaMethod.getReturnType(), express).getExpression());
                 return returnValue;
             }
         }.visitReturn();

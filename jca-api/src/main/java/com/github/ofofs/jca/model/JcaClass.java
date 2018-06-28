@@ -44,7 +44,7 @@ public class JcaClass extends JcaCommon {
         }
 
         importPackage(this, jcaField.getTypeClass());
-        statements.append(treeMaker.VarDef(treeMaker.Modifiers(jcaField.getModifiers()), names.fromString(jcaField.getFieldName()), getType(jcaField.getTypeClass()), jcaField.getValue().getObject()));
+        statements.append(treeMaker.VarDef(treeMaker.Modifiers(jcaField.getModifiers()), names.fromString(jcaField.getFieldName()), getType(jcaField.getTypeClass()), jcaField.getValue().getExpression()));
         for (JCTree jcTree : classDecl.defs) {
             statements.append(jcTree);
         }
