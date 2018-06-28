@@ -154,7 +154,7 @@ public class CountProcessor extends AbstractJcaProcessor {
         String prefix = PropertiesUtil.getProperty("count.prefix");
         Set<JcaClass> handlers = getJcaClasses(Handler.class);
         for (JcaClass handler : handlers) {
-            Handler anno = handler.getClazz().getAnnotation(Handler.class);
+            Handler anno = handler.getClassSym().getAnnotation(Handler.class);
             if (anno.value() == Handler.Type.COUNT) {
                 // 优先使用@Handler注解, 默认值为""
                 return anno.prefix();

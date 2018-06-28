@@ -76,7 +76,7 @@ public class JcaCommon {
      * @param importClass 要导入的包
      */
     public static void importPackage(JcaClass jcaClass, String importClass) {
-        JCTree.JCCompilationUnit compilationUnit = (JCTree.JCCompilationUnit) trees.getPath(jcaClass.getClazz()).getCompilationUnit();
+        JCTree.JCCompilationUnit compilationUnit = (JCTree.JCCompilationUnit) trees.getPath(jcaClass.getClassSym()).getCompilationUnit();
 
         JCTree.JCFieldAccess fieldAccess = treeMaker.Select(treeMaker.Ident(names.fromString(importClass.substring(0, importClass.lastIndexOf(".")))), names.fromString(importClass.substring(importClass.lastIndexOf(".") + 1)));
         JCTree.JCImport jcImport = treeMaker.Import(fieldAccess, false);

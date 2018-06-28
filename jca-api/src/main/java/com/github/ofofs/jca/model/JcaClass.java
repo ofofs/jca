@@ -16,18 +16,18 @@ import com.sun.tools.javac.util.ListBuffer;
 public class JcaClass extends JcaCommon {
 
     /**
-     * 类
+     * 类的标识
      */
-    private Symbol.ClassSymbol clazz;
+    private Symbol.ClassSymbol classSym;
 
     /**
-     * 类的定义
+     * 类的声明
      */
     private JCTree.JCClassDecl classDecl;
 
-    public JcaClass(Symbol.ClassSymbol clazz) {
-        this.clazz = clazz;
-        classDecl = (JCTree.JCClassDecl) trees.getTree(clazz);
+    public JcaClass(Symbol.ClassSymbol classSym) {
+        this.classSym = classSym;
+        classDecl = (JCTree.JCClassDecl) trees.getTree(classSym);
     }
 
     /**
@@ -57,8 +57,8 @@ public class JcaClass extends JcaCommon {
      *
      * @return 返回当前类
      */
-    public Symbol.ClassSymbol getClazz() {
-        return clazz;
+    public Symbol.ClassSymbol getClassSym() {
+        return classSym;
     }
 
     /**
@@ -67,7 +67,7 @@ public class JcaClass extends JcaCommon {
      * @return 返回类的全路径
      */
     public String getFullName() {
-        return clazz.fullname.toString();
+        return classSym.fullname.toString();
     }
 
     /**
@@ -76,7 +76,7 @@ public class JcaClass extends JcaCommon {
      * @return 返回类的包名
      */
     public String getPackageName() {
-        return clazz.owner.toString();
+        return classSym.owner.toString();
     }
 
     /**
@@ -85,7 +85,7 @@ public class JcaClass extends JcaCommon {
      * @return 返回类名
      */
     public String getClassName() {
-        return clazz.name.toString();
+        return classSym.name.toString();
     }
 
     /**
@@ -135,6 +135,7 @@ public class JcaClass extends JcaCommon {
      */
     public void setModifier(int modifier) {
         classDecl.mods = treeMaker.Modifiers(modifier);
+
     }
 
     /**
@@ -166,12 +167,12 @@ public class JcaClass extends JcaCommon {
 
         JcaClass jcaClass = (JcaClass) o;
 
-        return clazz != null ? clazz.equals(jcaClass.clazz) : jcaClass.clazz == null;
+        return classSym != null ? classSym.equals(jcaClass.classSym) : jcaClass.classSym == null;
     }
 
     @Override
     public int hashCode() {
-        return clazz != null ? clazz.hashCode() : 0;
+        return classSym != null ? classSym.hashCode() : 0;
     }
 
     /**

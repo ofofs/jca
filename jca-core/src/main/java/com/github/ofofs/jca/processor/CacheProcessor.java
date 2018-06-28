@@ -178,7 +178,7 @@ public class CacheProcessor extends AbstractJcaProcessor {
         String prefix = PropertiesUtil.getProperty("cache.prefix");
         Set<JcaClass> handlers = getJcaClasses(Handler.class);
         for (JcaClass handler : handlers) {
-            Handler anno = handler.getClazz().getAnnotation(Handler.class);
+            Handler anno = handler.getClassSym().getAnnotation(Handler.class);
             if (anno.value() == Handler.Type.CACHE) {
                 // 优先使用@Handler注解, 默认值为""
                 return anno.prefix();
@@ -205,7 +205,7 @@ public class CacheProcessor extends AbstractJcaProcessor {
         // 次优先使用@Handler的失效时间
         Set<JcaClass> handlers = getJcaClasses(Handler.class);
         for (JcaClass handler : handlers) {
-            Handler anno = handler.getClazz().getAnnotation(Handler.class);
+            Handler anno = handler.getClassSym().getAnnotation(Handler.class);
             if (anno.value() == Handler.Type.CACHE) {
                 expire = anno.expire();
                 if (expire != -1) {

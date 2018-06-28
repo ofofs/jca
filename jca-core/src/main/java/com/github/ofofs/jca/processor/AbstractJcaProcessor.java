@@ -26,7 +26,7 @@ public abstract class AbstractJcaProcessor extends BaseProcessor {
     protected JcaClass getHandler(Handler.Type type) {
         Set<JcaClass> handlers = getJcaClasses(Handler.class);
         for (JcaClass handler : handlers) {
-            Handler anno = handler.getClazz().getAnnotation(Handler.class);
+            Handler anno = handler.getClassSym().getAnnotation(Handler.class);
             if (anno.value() == type) {
                 return handler;
             }
@@ -45,7 +45,7 @@ public abstract class AbstractJcaProcessor extends BaseProcessor {
         // 优先使用@Handler注解
         Set<JcaClass> handlers = getJcaClasses(Handler.class);
         for (JcaClass handler : handlers) {
-            Handler anno = handler.getClazz().getAnnotation(Handler.class);
+            Handler anno = handler.getClassSym().getAnnotation(Handler.class);
             if (anno.value() == type) {
                 return anno.enable();
             }
