@@ -141,6 +141,7 @@ public class JcaClass extends JcaCommon {
      * 设置类的修饰符
      *
      * @param modifier 修饰符
+     * @return 返回当前类
      */
     public JcaClass setModifier(int modifier) {
         classDecl.mods = treeMaker.Modifiers(modifier);
@@ -149,6 +150,8 @@ public class JcaClass extends JcaCommon {
 
     /**
      * 设置无参数私有构造器
+     *
+     * @return 返回当前类
      */
     public JcaClass setNoArgPrivateConstructor() {
         // 遍历类的所有字段和方法
