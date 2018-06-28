@@ -142,15 +142,15 @@ public class JcaClass extends JcaCommon {
      *
      * @param modifier 修饰符
      */
-    public void setModifier(int modifier) {
+    public JcaClass setModifier(int modifier) {
         classDecl.mods = treeMaker.Modifiers(modifier);
-
+        return this;
     }
 
     /**
      * 设置无参数私有构造器
      */
-    public void setNoArgPrivateConstructor() {
+    public JcaClass setNoArgPrivateConstructor() {
         // 遍历类的所有字段和方法
         for (JCTree jcTree : classDecl.defs) {
             // 只处理方法
@@ -163,6 +163,8 @@ public class JcaClass extends JcaCommon {
                 }
             }
         }
+
+        return this;
     }
 
     @Override
