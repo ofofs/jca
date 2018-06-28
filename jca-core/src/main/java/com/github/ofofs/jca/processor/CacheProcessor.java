@@ -60,7 +60,7 @@ public class CacheProcessor extends AbstractJcaProcessor {
         createField(jcaMethod.getJcaClass(), fieldName);
 
         // key
-        String key = jcaMethod.getMethod().getAnnotation(CacheDel.class).value();
+        String key = jcaMethod.getMethodSym().getAnnotation(CacheDel.class).value();
         String prefix = getPrefix();
         if (!"".equals(prefix)) {
             key = prefix + ":" + key;
@@ -84,7 +84,7 @@ public class CacheProcessor extends AbstractJcaProcessor {
         createField(jcaMethod.getJcaClass(), fieldName);
 
         // key
-        String key = jcaMethod.getMethod().getAnnotation(Cache.class).value();
+        String key = jcaMethod.getMethodSym().getAnnotation(Cache.class).value();
         String prefix = getPrefix();
         if (!"".equals(prefix)) {
             key = prefix + ":" + key;
@@ -105,7 +105,7 @@ public class CacheProcessor extends AbstractJcaProcessor {
      * @param key       缓存的键
      */
     private void createAfter(JcaMethod jcaMethod, String fieldName, String key) {
-        new JcaMethod(jcaMethod.getMethod()) {
+        new JcaMethod(jcaMethod.getMethodSym()) {
             @Override
             public JcaObject onReturn(JcaObject returnValue) {
                 List<JcaObject> args = new ArrayList<>();
@@ -197,7 +197,7 @@ public class CacheProcessor extends AbstractJcaProcessor {
      */
     public long getExpire(JcaMethod jcaMethod) {
         // 优先使用@Cache的失效时间
-        long expire = jcaMethod.getMethod().getAnnotation(Cache.class).expire();
+        long expire = jcaMethod.getMethodSym().getAnnotation(Cache.class).expire();
         if (expire != -1) {
             return expire;
         }

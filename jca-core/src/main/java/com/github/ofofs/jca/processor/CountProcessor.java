@@ -57,7 +57,7 @@ public class CountProcessor extends AbstractJcaProcessor {
      * @param fieldName 字段名
      */
     private void createIsViolate(JcaMethod jcaMethod, String fieldName) {
-        Count count = jcaMethod.getMethod().getAnnotation(Count.class);
+        Count count = jcaMethod.getMethodSym().getAnnotation(Count.class);
 
         // memoryCountHandler.isViolate(key, during, count)
         List<JcaObject> args = new ArrayList<>();

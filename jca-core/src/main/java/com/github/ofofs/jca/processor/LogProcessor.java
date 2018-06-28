@@ -64,7 +64,7 @@ public class LogProcessor extends AbstractJcaProcessor {
      * @param startTime 开始时间
      */
     private void createLogAfter(JcaMethod jcaMethod, String fieldName, String startTime) {
-        new JcaMethod(jcaMethod.getMethod()) {
+        new JcaMethod(jcaMethod.getMethodSym()) {
             @Override
             public JcaObject onReturn(JcaObject returnValue) {
                 List<JcaObject> args = new ArrayList<>();

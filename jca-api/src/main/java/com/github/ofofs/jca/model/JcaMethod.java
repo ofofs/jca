@@ -19,12 +19,12 @@ import java.util.List;
 public class JcaMethod extends JcaCommon {
 
     /**
-     * 方法
+     * 方法的标识
      */
-    private Symbol.MethodSymbol method;
+    private Symbol.MethodSymbol methodSym;
 
     /**
-     * 方法的定义
+     * 方法的声明
      */
     private JCTree.JCMethodDecl methodDecl;
 
@@ -33,18 +33,18 @@ public class JcaMethod extends JcaCommon {
      */
     private JcaClass jcaClass;
 
-    public JcaMethod(Symbol.MethodSymbol method) {
-        this.method = method;
-        jcaClass = new JcaClass((Symbol.ClassSymbol) method.owner);
-        methodDecl = (JCTree.JCMethodDecl) trees.getTree(method);
+    public JcaMethod(Symbol.MethodSymbol methodSym) {
+        this.methodSym = methodSym;
+        jcaClass = new JcaClass((Symbol.ClassSymbol) methodSym.owner);
+        methodDecl = (JCTree.JCMethodDecl) trees.getTree(methodSym);
     }
 
     public JcaClass getJcaClass() {
         return jcaClass;
     }
 
-    public Symbol.MethodSymbol getMethod() {
-        return method;
+    public Symbol.MethodSymbol getMethodSym() {
+        return methodSym;
     }
 
     /**
@@ -54,7 +54,6 @@ public class JcaMethod extends JcaCommon {
      * @return 返回当前方法
      */
     public JcaMethod insert(JcaVariable jcaVariable) {
-        JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) trees.getTree(this.getMethod());
         ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
 
         importPackage(getJcaClass(), jcaVariable.getTypeClass());
@@ -73,7 +72,6 @@ public class JcaMethod extends JcaCommon {
      * @return 返回当前方法
      */
     public JcaMethod insert(JcaObject express) {
-        JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) trees.getTree(getMethod());
         ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
 
         statements.append(treeMaker.Exec(express.getObject()));
@@ -91,7 +89,6 @@ public class JcaMethod extends JcaCommon {
      * @return 返回当前方法
      */
     public JcaMethod insertBlock(JcaObject express) {
-        JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) trees.getTree(getMethod());
         ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
 
         statements.append(express.getStatement());
@@ -108,7 +105,7 @@ public class JcaMethod extends JcaCommon {
      * @return 返回方法名
      */
     public String getMethodName() {
-        return method.name.toString();
+        return methodSym.name.toString();
     }
 
     /**
@@ -126,7 +123,7 @@ public class JcaMethod extends JcaCommon {
      * @return 返回方法的参数
      */
     public List<JcaObject> getArgs() {
-        com.sun.tools.javac.util.List<Symbol.VarSymbol> params = method.params;
+        com.sun.tools.javac.util.List<Symbol.VarSymbol> params = methodSym.params;
         List<JcaObject> result = new ArrayList();
 
         if (params != null) {
@@ -317,7 +314,7 @@ public class JcaMethod extends JcaCommon {
 
         JcaMethod jcaMethod = (JcaMethod) o;
 
-        if (method != null ? !method.equals(jcaMethod.method) : jcaMethod.method != null) {
+        if (methodSym != null ? !methodSym.equals(jcaMethod.methodSym) : jcaMethod.methodSym != null) {
             return false;
         }
         return jcaClass != null ? jcaClass.equals(jcaMethod.jcaClass) : jcaMethod.jcaClass == null;
@@ -325,7 +322,7 @@ public class JcaMethod extends JcaCommon {
 
     @Override
     public int hashCode() {
-        int result = method != null ? method.hashCode() : 0;
+        int result = methodSym != null ? methodSym.hashCode() : 0;
         result = 31 * result + (jcaClass != null ? jcaClass.hashCode() : 0);
         return result;
     }
