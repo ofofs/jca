@@ -89,6 +89,15 @@ public class JcaClass extends JcaCommon {
     }
 
     /**
+     * 判断类是不是有某个修饰符
+     *
+     * @return 如果类有某个修饰符的返回true，否则返回false
+     */
+    public boolean hasModifier(int modifier) {
+        return classDecl.mods.flags % (modifier * 2) >= modifier;
+    }
+
+    /**
      * 添加接口
      *
      * @param interfaceClass 接口类
