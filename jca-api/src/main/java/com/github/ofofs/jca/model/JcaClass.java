@@ -76,8 +76,7 @@ public class JcaClass extends JcaCommon {
      * @return 返回类的包名
      */
     public String getPackageName() {
-        String fullName = clazz.fullname.toString();
-        return fullName.substring(0, fullName.lastIndexOf("."));
+        return clazz.owner.toString();
     }
 
     /**
@@ -86,8 +85,7 @@ public class JcaClass extends JcaCommon {
      * @return 返回类名
      */
     public String getClassName() {
-        String fullName = clazz.fullname.toString();
-        return fullName.substring(fullName.lastIndexOf(".") + 1);
+        return clazz.name.toString();
     }
 
     /**
