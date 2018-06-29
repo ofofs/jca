@@ -114,7 +114,7 @@ public class JcaMethod extends JcaCommon {
      * @return 返回方法名
      */
     public JcaMethod setModifier(int modifier) {
-        methodDecl.mods = treeMaker.Modifiers(modifier);
+        methodDecl.mods.flags = modifier;
         return this;
     }
 

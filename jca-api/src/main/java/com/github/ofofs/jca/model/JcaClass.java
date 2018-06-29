@@ -144,7 +144,7 @@ public class JcaClass extends JcaCommon {
      * @return 返回当前类
      */
     public JcaClass setModifier(int modifier) {
-        classDecl.mods = treeMaker.Modifiers(modifier);
+        classDecl.mods.flags = modifier;
         return this;
     }
 
@@ -162,7 +162,7 @@ public class JcaClass extends JcaCommon {
                 // 如果是构造方法 并且 没有参数
                 if (JcaConstants.CONSTRUCTOR_NAME.equals(methodDecl.name.toString()) && methodDecl.params.isEmpty()) {
                     // 把修饰符改为private
-                    methodDecl.mods = treeMaker.Modifiers(Flags.PRIVATE);
+                    methodDecl.mods.flags = Flags.PRIVATE;
                 }
             }
         }
