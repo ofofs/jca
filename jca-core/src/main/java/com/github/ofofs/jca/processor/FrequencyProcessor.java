@@ -1,9 +1,9 @@
 package com.github.ofofs.jca.processor;
 
-import com.github.ofofs.jca.annotation.Count;
+import com.github.ofofs.jca.annotation.Frequency;
 import com.github.ofofs.jca.annotation.Handler;
 import com.github.ofofs.jca.constants.CoreConstants;
-import com.github.ofofs.jca.handler.impl.MemoryCountHandler;
+import com.github.ofofs.jca.handler.impl.MemoryFrequencyHandler;
 import com.github.ofofs.jca.model.*;
 import com.github.ofofs.jca.util.JcaExpressionUtil;
 import com.github.ofofs.jca.util.PropertiesUtil;
@@ -16,22 +16,22 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 调用次数限制注解处理器
+ * 调用间隔限制注解处理器
  *
  * @author kangyonggan
  * @since 6/23/18
  */
-public class CountProcessor extends AbstractJcaProcessor {
+public class FrequencyProcessor extends AbstractJcaProcessor {
 
-    protected CountProcessor(RoundEnvironment env) {
+    protected FrequencyProcessor(RoundEnvironment env) {
         super(env);
     }
 
     @Override
     protected void process() {
-        if (isEnable(Handler.Type.COUNT)) {
+        if (isEnable(Handler.Type.FREQUENCY)) {
             String fieldName = Sequence.nextString("field");
-            for (JcaMethod jcaMethod : getJcaMethods(Count.class)) {
+            for (JcaMethod jcaMethod : getJcaMethods(Frequency.class)) {
                 process(jcaMethod, fieldName);
             }
         }
@@ -51,31 +51,30 @@ public class CountProcessor extends AbstractJcaProcessor {
     }
 
     /**
-     * if (memoryCountHandler.isViolate(key, during, count)) {return (ReturnType) this.violate(args);}
+     * if (memoryFrequencyHandler.isViolate(key, interval, count)) {return (ReturnType) this.violate(args);}
      *
      * @param jcaMethod 方法
      * @param fieldName 字段名
      */
     private void createIsViolate(JcaMethod jcaMethod, String fieldName) {
-        Count count = jcaMethod.getMethodSym().getAnnotation(Count.class);
+        Frequency frequency = jcaMethod.getMethodSym().getAnnotation(Frequency.class);
 
-        // memoryCountHandler.isViolate(key, during, count)
+        // memoryFrequencyHandler.isViolate(key, interval)
         List<JcaObject> args = new ArrayList<>();
         // key
-        args.add(getKey(jcaMethod, count));
-        // during
-        args.add(JcaCommon.getValue(count.during()));
-        // count
-        args.add(JcaCommon.getValue(count.count()));
+        args.add(getKey(jcaMethod, frequency));
+        // interval
+        args.add(JcaCommon.getValue(frequency.interval()));
         JcaObject isViolate = JcaCommon.method(fieldName, "isViolate", args);
 
         if (jcaMethod.hasReturnValue()) {
+            // 有返回值的情况
             // if (isViolate) {return (returnType) this.violate(args);}
             JcaObject ifBlock;
             if (jcaMethod.isStatic()) {
-                ifBlock = JcaCommon.getReturn(JcaCommon.classCast(jcaMethod.getReturnType(), JcaCommon.method(jcaMethod.getJcaClass().getClassName(), count.violate(), jcaMethod.getArgs())));
+                ifBlock = JcaCommon.getReturn(JcaCommon.classCast(jcaMethod.getReturnType(), JcaCommon.method(jcaMethod.getJcaClass().getClassName(), frequency.violate(), jcaMethod.getArgs())));
             } else {
-                ifBlock = JcaCommon.getReturn(JcaCommon.classCast(jcaMethod.getReturnType(), JcaCommon.method("this", count.violate(), jcaMethod.getArgs())));
+                ifBlock = JcaCommon.getReturn(JcaCommon.classCast(jcaMethod.getReturnType(), JcaCommon.method("this", frequency.violate(), jcaMethod.getArgs())));
             }
             JcaObject ifExpress = JcaCommon.getIf(isViolate, ifBlock);
 
@@ -85,9 +84,9 @@ public class CountProcessor extends AbstractJcaProcessor {
             // if (isViolate) {this.violate(args);return;}
             JcaObject ifBlock;
             if (jcaMethod.isStatic()) {
-                ifBlock = JcaCommon.method(jcaMethod.getJcaClass().getClassName(), count.violate(), jcaMethod.getArgs());
+                ifBlock = JcaCommon.method(jcaMethod.getJcaClass().getClassName(), frequency.violate(), jcaMethod.getArgs());
             } else {
-                ifBlock = JcaCommon.method("this", count.violate(), jcaMethod.getArgs());
+                ifBlock = JcaCommon.method("this", frequency.violate(), jcaMethod.getArgs());
             }
             ifBlock = JcaCommon.block(ifBlock, JcaCommon.getReturn());
             JcaObject ifExpress = JcaCommon.getIf(isViolate, ifBlock);
@@ -99,15 +98,15 @@ public class CountProcessor extends AbstractJcaProcessor {
      * 获取键
      *
      * @param jcaMethod 所在方法
-     * @param count     @Count注解
+     * @param frequency @Frequency注解
      * @return 返回键
      */
-    private JcaObject getKey(JcaMethod jcaMethod, Count count) {
-        String key = count.key();
-        String value = count.value();
+    private JcaObject getKey(JcaMethod jcaMethod, Frequency frequency) {
+        String key = frequency.key();
+        String value = frequency.value();
         if (CoreConstants.EMPTY.equals(value)) {
             if (CoreConstants.EMPTY.equals(key)) {
-                throw new RuntimeException("@Count注解的key和value不能同时为空！");
+                throw new RuntimeException("@Frequency注解的key和value不能同时为空！");
             }
 
             if (jcaMethod.isStatic()) {
@@ -125,22 +124,22 @@ public class CountProcessor extends AbstractJcaProcessor {
     }
 
     /**
-     * private static final MemoryCountHandler fieldName = new MemoryCountHandler();
+     * private static final MemoryFrequencyHandler fieldName = new MemoryFrequencyHandler();
      *
      * @param jcaClass  类
      * @param fieldName 字段名
      */
     private void createField(JcaClass jcaClass, String fieldName) {
-        String handlerClass = MemoryCountHandler.class.getName();
-        JcaClass handler = getHandler(Handler.Type.COUNT);
+        String handlerClass = MemoryFrequencyHandler.class.getName();
+        JcaClass handler = getHandler(Handler.Type.FREQUENCY);
         if (handler != null) {
             handlerClass = handler.getFullName();
         }
 
-        // new MemoryCountHandler()
+        // new MemoryFrequencyHandler()
         JcaObject value = JcaCommon.instance(jcaClass, handlerClass);
 
-        // private static final MemoryCountHandler fieldName = value;
+        // private static final MemoryFrequencyHandler fieldName = value;
         JcaField jcaField = new JcaField(Flags.PRIVATE | Flags.STATIC | Flags.FINAL, handlerClass, fieldName, value);
         jcaClass.insert(jcaField);
     }
@@ -151,11 +150,11 @@ public class CountProcessor extends AbstractJcaProcessor {
      * @return 返回注解句柄的前缀
      */
     private String getPrefix() {
-        String prefix = PropertiesUtil.getProperty("count.prefix");
+        String prefix = PropertiesUtil.getProperty("frequency.prefix");
         Set<JcaClass> handlers = getJcaClasses(Handler.class);
         for (JcaClass handler : handlers) {
             Handler anno = handler.getClassSym().getAnnotation(Handler.class);
-            if (anno.value() == Handler.Type.COUNT) {
+            if (anno.value() == Handler.Type.FREQUENCY) {
                 // 优先使用@Handler注解, 默认值为""
                 return anno.prefix();
             }

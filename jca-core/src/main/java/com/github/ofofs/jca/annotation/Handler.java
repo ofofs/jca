@@ -61,7 +61,11 @@ public @interface Handler {
         /**
          * 限制调用次数
          */
-        COUNT
+        COUNT,
+        /**
+         * 限制调用间隔时间
+         */
+        FREQUENCY
     }
 
 }

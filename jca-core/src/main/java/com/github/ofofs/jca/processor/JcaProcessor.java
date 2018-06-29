@@ -34,6 +34,8 @@ public class JcaProcessor extends AbstractProcessor {
         new LogProcessor(env).process();
         // 调用次数限制(调用次数限制注解需要在日志注解后面处理)
         new CountProcessor(env).process();
+        // 调用间隔限制(调用间隔限制注解需要在日志注解后面处理)
+        new FrequencyProcessor(env).process();
         // 工具类处理
         new UtilProcessor(env).process();
         return true;
