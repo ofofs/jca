@@ -34,6 +34,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>jca-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jca-unit</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
