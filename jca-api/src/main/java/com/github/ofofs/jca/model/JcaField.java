@@ -4,6 +4,8 @@ import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
 
+import java.util.Objects;
+
 import static com.github.ofofs.jca.model.JcaCommon.trees;
 
 /**
@@ -124,5 +126,27 @@ public class JcaField {
      */
     public boolean hasModifier(int modifier) {
         return variableDecl.mods.flags % (modifier * 2) >= modifier;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        JcaField jcaField = (JcaField) o;
+        return modifiers == jcaField.modifiers &&
+                Objects.equals(varSym, jcaField.varSym) &&
+                Objects.equals(variableDecl, jcaField.variableDecl) &&
+                Objects.equals(typeClass, jcaField.typeClass) &&
+                Objects.equals(fieldName, jcaField.fieldName) &&
+                Objects.equals(value, jcaField.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(varSym, variableDecl, modifiers, typeClass, fieldName, value);
     }
 }
