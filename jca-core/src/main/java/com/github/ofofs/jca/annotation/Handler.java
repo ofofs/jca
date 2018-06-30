@@ -65,7 +65,11 @@ public @interface Handler {
         /**
          * 限制调用间隔时间
          */
-        FREQUENCY
+        FREQUENCY,
+        /**
+         * 生成getter
+         */
+        GETTER
     }
 
 }

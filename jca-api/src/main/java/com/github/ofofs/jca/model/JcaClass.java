@@ -2,9 +2,11 @@ package com.github.ofofs.jca.model;
 
 import com.github.ofofs.jca.constants.JcaConstants;
 import com.github.ofofs.jca.util.Sequence;
+import com.sun.codemodel.internal.JNullType;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
@@ -105,7 +107,7 @@ public class JcaClass extends JcaCommon {
      */
     public JcaClass addInterface(Class<?> interfaceClass) {
         // 判断类有没有实现此接口
-        if (!hasInterface(interfaceClass)) {
+        if (!existsInterface(interfaceClass)) {
             // 导包（会自动去重）
             importPackage(this, interfaceClass);
 
@@ -195,7 +197,7 @@ public class JcaClass extends JcaCommon {
      * @param interfaceClass 接口
      * @return 如果类已经实现了指定接口则返回true，否则返回false
      */
-    private boolean hasInterface(Class<?> interfaceClass) {
+    private boolean existsInterface(Class<?> interfaceClass) {
         for (JCTree.JCExpression impl : classDecl.implementing) {
             if (impl.type.toString().equals(interfaceClass.getName())) {
                 return true;
@@ -220,5 +222,104 @@ public class JcaClass extends JcaCommon {
             }
         }
         return false;
+    }
+
+    /**
+     * 判断是否存在方法
+     *
+     * @param methodName 方法名
+     * @return 若存在返回true，否则返回false
+     */
+    public boolean existsMethod(String methodName, Class<?>... paramsType) {
+        for (JCTree jcTree : classDecl.defs) {
+            if (jcTree.getKind() == Tree.Kind.METHOD) {
+                JCTree.JCMethodDecl method = (JCTree.JCMethodDecl) jcTree;
+                if (methodName.equals(method.name.toString())) {
+                    // 方法名一致还要再比较参数类型
+                    if (compareParamsType(method.params, paramsType)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 比较参数类型是否一致
+     *
+     * @param params     参数定义
+     * @param paramsType 参数类型
+     * @return 如果一致返回true，否则返回false
+     */
+    private boolean compareParamsType(List<JCTree.JCVariableDecl> params, Class<?>... paramsType) {
+        if (params.size() != paramsType.length) {
+            return false;
+        }
+        for (int i = 0; i < params.size(); i++) {
+            JCTree.JCVariableDecl param = params.get(i);
+            // 如果参数是基本类型
+            if (param.vartype instanceof JCTree.JCPrimitiveTypeTree) {
+                TypeTag typeTag = ((JCTree.JCPrimitiveTypeTree) param.vartype).typetag;
+                if (typeTag == TypeTag.INT && Integer.class != paramsType[i]) {
+                    return false;
+                } else if (typeTag == TypeTag.BOOLEAN && Boolean.class != paramsType[i]) {
+                    return false;
+                } else if (typeTag == TypeTag.BYTE && Byte.class != paramsType[i]) {
+                    return false;
+                } else if (typeTag == TypeTag.CHAR && Character.class != paramsType[i]) {
+                    return false;
+                } else if (typeTag == TypeTag.LONG && Long.class != paramsType[i]) {
+                    return false;
+                } else if (typeTag == TypeTag.DOUBLE && Double.class != paramsType[i]) {
+                    return false;
+                } else if (typeTag == TypeTag.FLOAT && Float.class != paramsType[i]) {
+                    return false;
+                } else if (typeTag == TypeTag.SHORT && Short.class != paramsType[i]) {
+                    return false;
+                }
+            }
+            // 如果参数是引用类型
+            if (param.vartype instanceof JCTree.JCIdent) {
+                if (!((JCTree.JCIdent) param.vartype).sym.toString().equals(paramsType[i].getName())) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 添加getter方法
+     *
+     * @param jcaField 字段
+     * @return 返回当前类
+     */
+    public JcaClass addGetterMethod(JcaField jcaField) {
+        String methodName = jcaField.getGetterMethodName();
+        if (!existsMethod(methodName)) {
+            JCTree.JCModifiers modifiers = treeMaker.Modifiers(Flags.PUBLIC);
+            // 判断字段是不是静态的
+            if (jcaField.isStatic()) {
+                modifiers = treeMaker.Modifiers(Flags.PUBLIC | Flags.STATIC);
+            }
+
+            // 方法体
+            ListBuffer stats = new ListBuffer();
+            stats.append(treeMaker.Return(JcaCommon.getVar(jcaField.getFieldName()).getExpression()));
+            JCTree.JCBlock body = treeMaker.Block(0, stats.toList());
+
+            JCTree.JCMethodDecl methodDecl = treeMaker.MethodDef(modifiers, names.fromString(methodName), jcaField.getType().getExpression(), List.nil(), List.nil(), List.nil(), body, null);
+
+            ListBuffer<JCTree> statements = new ListBuffer<>();
+            statements.append(methodDecl);
+            for (JCTree jcTree : classDecl.defs) {
+                statements.append(jcTree);
+            }
+            classDecl.defs = statements.toList();
+        }
+
+        return this;
     }
 }

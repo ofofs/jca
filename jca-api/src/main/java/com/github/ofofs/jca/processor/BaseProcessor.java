@@ -1,6 +1,7 @@
 package com.github.ofofs.jca.processor;
 
 import com.github.ofofs.jca.model.JcaClass;
+import com.github.ofofs.jca.model.JcaField;
 import com.github.ofofs.jca.model.JcaMethod;
 import com.sun.tools.javac.code.Symbol;
 
@@ -58,5 +59,20 @@ public abstract class BaseProcessor {
             jcaClasses.add(new JcaClass((Symbol.ClassSymbol) e));
         }
         return jcaClasses;
+    }
+
+    /**
+     * 获取带有指定注解的字段
+     *
+     * @param annotationClass 注解类
+     * @return 返回所有带有指定注解的字段
+     */
+    protected Set<JcaField> getJcaFields(Class<? extends Annotation> annotationClass) {
+        Set<? extends Element> elements = env.getElementsAnnotatedWith(annotationClass);
+        Set<JcaField> jcaFields = new HashSet<>(elements.size());
+        for (Element e : elements) {
+            jcaFields.add(new JcaField((Symbol.VarSymbol) e));
+        }
+        return jcaFields;
     }
 }
