@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * @since 6/22/18
  */
 @Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.TYPE})
 public @interface Getter {
 
 }

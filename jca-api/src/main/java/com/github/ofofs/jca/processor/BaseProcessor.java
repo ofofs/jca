@@ -41,7 +41,9 @@ public abstract class BaseProcessor {
         Set<? extends Element> elements = env.getElementsAnnotatedWith(annotationClass);
         Set<JcaMethod> jcaMethods = new HashSet<>(elements.size());
         for (Element e : elements) {
-            jcaMethods.add(new JcaMethod((Symbol.MethodSymbol) e));
+            if (e instanceof Symbol.MethodSymbol) {
+                jcaMethods.add(new JcaMethod((Symbol.MethodSymbol) e));
+            }
         }
         return jcaMethods;
     }
@@ -56,7 +58,9 @@ public abstract class BaseProcessor {
         Set<? extends Element> elements = env.getElementsAnnotatedWith(annotationClass);
         Set<JcaClass> jcaClasses = new HashSet<>(elements.size());
         for (Element e : elements) {
-            jcaClasses.add(new JcaClass((Symbol.ClassSymbol) e));
+            if (e instanceof Symbol.ClassSymbol) {
+                jcaClasses.add(new JcaClass((Symbol.ClassSymbol) e));
+            }
         }
         return jcaClasses;
     }
@@ -71,7 +75,9 @@ public abstract class BaseProcessor {
         Set<? extends Element> elements = env.getElementsAnnotatedWith(annotationClass);
         Set<JcaField> jcaFields = new HashSet<>(elements.size());
         for (Element e : elements) {
-            jcaFields.add(new JcaField((Symbol.VarSymbol) e));
+            if (e instanceof Symbol.VarSymbol) {
+                jcaFields.add(new JcaField((Symbol.VarSymbol) e));
+            }
         }
         return jcaFields;
     }

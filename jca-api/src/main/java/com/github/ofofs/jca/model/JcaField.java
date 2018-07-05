@@ -59,8 +59,12 @@ public class JcaField {
     }
 
     public JcaField(Symbol.VarSymbol varSym) {
+        this((JCTree.JCVariableDecl) trees.getTree(varSym));
         this.varSym = varSym;
-        variableDecl = (JCTree.JCVariableDecl) trees.getTree(varSym);
+    }
+
+    public JcaField(JCTree.JCVariableDecl variableDecl) {
+        this.variableDecl = variableDecl;
 
         // 初始化一些信息
         this.modifiers = variableDecl.mods.flags;

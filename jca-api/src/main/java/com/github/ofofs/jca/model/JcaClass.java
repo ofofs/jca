@@ -11,6 +11,8 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
 
+import java.util.ArrayList;
+
 /**
  * @author kangyonggan
  * @since 6/22/18
@@ -321,5 +323,21 @@ public class JcaClass extends JcaCommon {
         }
 
         return this;
+    }
+
+    /**
+     * 获取类的所有字段
+     *
+     * @return 返回类的所有字段
+     */
+    public java.util.List<JcaField> getJcaFields() {
+        java.util.List<JcaField> jcaFields = new ArrayList<>();
+        for (JCTree jcTree : classDecl.defs) {
+            if (jcTree instanceof JCTree.JCVariableDecl) {
+                jcaFields.add(new JcaField((JCTree.JCVariableDecl) jcTree));
+            }
+        }
+
+        return jcaFields;
     }
 }

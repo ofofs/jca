@@ -2,6 +2,7 @@ package com.github.ofofs.jca.processor;
 
 import com.github.ofofs.jca.annotation.Getter;
 import com.github.ofofs.jca.annotation.Handler;
+import com.github.ofofs.jca.model.JcaClass;
 import com.github.ofofs.jca.model.JcaField;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -21,6 +22,11 @@ public class GetterProcessor extends AbstractJcaProcessor {
     @Override
     protected void process() {
         if (isEnable(Handler.Type.GETTER)) {
+            for (JcaClass jcaClass : getJcaClasses(Getter.class)) {
+                for (JcaField jcaField : jcaClass.getJcaFields()) {
+                    jcaClass.addGetterMethod(jcaField);
+                }
+            }
             for (JcaField jcaField : getJcaFields(Getter.class)) {
                 jcaField.getJcaClass().addGetterMethod(jcaField);
             }
