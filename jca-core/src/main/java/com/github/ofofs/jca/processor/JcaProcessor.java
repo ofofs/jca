@@ -30,6 +30,8 @@ public class JcaProcessor extends AbstractProcessor {
         new SerialProcessor(env).process();
         // Getter
         new GetterProcessor(env).process();
+        // Setter
+        new SetterProcessor(env).process();
         // 缓存
         new CacheProcessor(env).process();
         // 日志(日志注解需要在缓存注解后面处理)

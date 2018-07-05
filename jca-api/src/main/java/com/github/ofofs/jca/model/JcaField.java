@@ -80,6 +80,15 @@ public class JcaField {
         return "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 
+    /**
+     * 获取字段的setter方法名
+     *
+     * @return 返回字段的setter方法名
+     */
+    public String getSetterMethodName() {
+        return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    }
+
     public long getModifiers() {
         return modifiers;
     }

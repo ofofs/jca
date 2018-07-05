@@ -230,9 +230,10 @@ public class JcaClass extends JcaCommon {
      * 判断是否存在方法
      *
      * @param methodName 方法名
-     * @return 若存在返回true，否则返回false
+     * @param paramsType 参数类型
+     * @return 弱存在返回true，否则返回false
      */
-    public boolean existsMethod(String methodName, Class<?>... paramsType) {
+    public boolean existsMethod(String methodName, JcaObject... paramsType) {
         for (JCTree jcTree : classDecl.defs) {
             if (jcTree.getKind() == Tree.Kind.METHOD) {
                 JCTree.JCMethodDecl method = (JCTree.JCMethodDecl) jcTree;
@@ -254,36 +255,37 @@ public class JcaClass extends JcaCommon {
      * @param paramsType 参数类型
      * @return 如果一致返回true，否则返回false
      */
-    private boolean compareParamsType(List<JCTree.JCVariableDecl> params, Class<?>... paramsType) {
+    private boolean compareParamsType(List<JCTree.JCVariableDecl> params, JcaObject... paramsType) {
         if (params.size() != paramsType.length) {
             return false;
         }
         for (int i = 0; i < params.size(); i++) {
+            String type = paramsType[i].getStatement().type.toString();
             JCTree.JCVariableDecl param = params.get(i);
             // 如果参数是基本类型
             if (param.vartype instanceof JCTree.JCPrimitiveTypeTree) {
                 TypeTag typeTag = ((JCTree.JCPrimitiveTypeTree) param.vartype).typetag;
-                if (typeTag == TypeTag.INT && Integer.class != paramsType[i]) {
+                if (typeTag == TypeTag.INT && Integer.class.getName().equals(type) ) {
                     return false;
-                } else if (typeTag == TypeTag.BOOLEAN && Boolean.class != paramsType[i]) {
+                } else if (typeTag == TypeTag.BOOLEAN && Boolean.class.getName().equals(type)) {
                     return false;
-                } else if (typeTag == TypeTag.BYTE && Byte.class != paramsType[i]) {
+                } else if (typeTag == TypeTag.BYTE && Byte.class.getName().equals(type)) {
                     return false;
-                } else if (typeTag == TypeTag.CHAR && Character.class != paramsType[i]) {
+                } else if (typeTag == TypeTag.CHAR && Character.class.getName().equals(type)) {
                     return false;
-                } else if (typeTag == TypeTag.LONG && Long.class != paramsType[i]) {
+                } else if (typeTag == TypeTag.LONG && Long.class.getName().equals(type)) {
                     return false;
-                } else if (typeTag == TypeTag.DOUBLE && Double.class != paramsType[i]) {
+                } else if (typeTag == TypeTag.DOUBLE && Double.class.getName().equals(type)) {
                     return false;
-                } else if (typeTag == TypeTag.FLOAT && Float.class != paramsType[i]) {
+                } else if (typeTag == TypeTag.FLOAT && Float.class.getName().equals(type)) {
                     return false;
-                } else if (typeTag == TypeTag.SHORT && Short.class != paramsType[i]) {
+                } else if (typeTag == TypeTag.SHORT && Short.class.getName().equals(type)) {
                     return false;
                 }
             }
             // 如果参数是引用类型
             if (param.vartype instanceof JCTree.JCIdent) {
-                if (!((JCTree.JCIdent) param.vartype).sym.toString().equals(paramsType[i].getName())) {
+                if (!((JCTree.JCIdent) param.vartype).sym.toString().equals(type)) {
                     return false;
                 }
             }
@@ -315,10 +317,56 @@ public class JcaClass extends JcaCommon {
             JCTree.JCMethodDecl methodDecl = treeMaker.MethodDef(modifiers, names.fromString(methodName), jcaField.getType().getExpression(), List.nil(), List.nil(), List.nil(), body, null);
 
             ListBuffer<JCTree> statements = new ListBuffer<>();
-            statements.append(methodDecl);
             for (JCTree jcTree : classDecl.defs) {
                 statements.append(jcTree);
             }
+            statements.append(methodDecl);
+            classDecl.defs = statements.toList();
+        }
+
+        return this;
+    }
+
+    /**
+     * 添加setter方法
+     *
+     * @param jcaField 字段
+     * @return 返回当前类
+     */
+    public JcaClass addSetterMethod(JcaField jcaField) {
+        String methodName = jcaField.getSetterMethodName();
+        if (!existsMethod(methodName, jcaField.getType())) {
+            JCTree.JCModifiers modifiers = treeMaker.Modifiers(Flags.PUBLIC);
+            // 判断字段是不是静态的
+            if (jcaField.isStatic()) {
+                modifiers = treeMaker.Modifiers(Flags.PUBLIC | Flags.STATIC);
+            }
+
+            // 方法体
+            ListBuffer<JCTree.JCStatement> stats = new ListBuffer<>();
+            String argName = Sequence.nextString("arg");
+            if (jcaField.isStatic()) {
+                JCTree.JCFieldAccess fieldAccess = treeMaker.Select(treeMaker.Ident(names.fromString(getClassName())), names.fromString(jcaField.getFieldName()));
+                JCTree.JCAssign assign = treeMaker.Assign(fieldAccess, treeMaker.Ident(names.fromString(argName)));
+                stats.append(treeMaker.Exec(assign));
+            } else {
+                JCTree.JCFieldAccess fieldAccess = treeMaker.Select(treeMaker.Ident(names.fromString("this")), names.fromString(jcaField.getFieldName()));
+                JCTree.JCAssign assign = treeMaker.Assign(fieldAccess, treeMaker.Ident(names.fromString(argName)));
+                stats.append(treeMaker.Exec(assign));
+            }
+            JCTree.JCBlock body = treeMaker.Block(0, stats.toList());
+
+            // 参数
+            ListBuffer<JCTree.JCVariableDecl> args = new ListBuffer<>();
+            args.append(treeMaker.Param(names.fromString(argName), jcaField.getType().getExpression().type, null));
+
+            JCTree.JCMethodDecl methodDecl = treeMaker.MethodDef(modifiers, names.fromString(methodName), treeMaker.TypeIdent(TypeTag.VOID), List.nil(), args.toList(), List.nil(), body, null);
+
+            ListBuffer<JCTree> statements = new ListBuffer<>();
+            for (JCTree jcTree : classDecl.defs) {
+                statements.append(jcTree);
+            }
+            statements.append(methodDecl);
             classDecl.defs = statements.toList();
         }
 

@@ -69,7 +69,11 @@ public @interface Handler {
         /**
          * 生成getter
          */
-        GETTER
+        GETTER,
+        /**
+         * 生成setter
+         */
+        SETTER
     }
 
 }
