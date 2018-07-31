@@ -14,7 +14,15 @@ import java.util.Set;
  * @author kangyonggan
  * @since 6/22/18
  */
-@SupportedAnnotationTypes("com.github.ofofs.jca.annotation.Serial")
+@SupportedAnnotationTypes({
+        "com.github.ofofs.jca.annotation.Cache",
+        "com.github.ofofs.jca.annotation.CacheDel",
+        "com.github.ofofs.jca.annotation.Count",
+        "com.github.ofofs.jca.annotation.Frequency",
+        "com.github.ofofs.jca.annotation.Log",
+        "com.github.ofofs.jca.annotation.Serial",
+        "com.github.ofofs.jca.annotation.Util"
+})
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class JcaProcessor extends AbstractProcessor {
 
