@@ -28,7 +28,9 @@ public final class PropertiesUtil {
         props = new Properties();
         try {
             InputStream in = PropertiesUtil.class.getClassLoader().getResourceAsStream(CoreConstants.PROPERTIES_NAME);
-            props.load(in);
+            if (in != null) {
+                props.load(in);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
