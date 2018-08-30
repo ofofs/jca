@@ -90,11 +90,11 @@ public class CacheProcessor extends AbstractJcaProcessor {
             key = prefix + ":" + key;
         }
 
-        // 在方法第一行创建代码块
-        createBefore(jcaMethod, fieldName, key);
-
         // 在return前创建代码块
         createAfter(jcaMethod, fieldName, key);
+
+        // 在方法第一行创建代码块
+        createBefore(jcaMethod, fieldName, key);
     }
 
     /**
